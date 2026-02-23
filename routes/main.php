@@ -1,2 +1,2 @@
 <?php
-renderView('main', ['title' => 'สวัสดีจ้า', 'result' => getUsers()]);
+renderView('main', ['title' => 'สวัสดีจ้า', 'result' => getEvent()]);
