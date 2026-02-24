@@ -10,6 +10,10 @@
         if ($row): // ตรวจสอบว่ามีข้อมูลใน $row หรือไม่
         ?>
             <h1>กิจกรรม</h1>
+
+            <a href="/event-new" style="display: inline-block; margin-bottom: 15px;"> + เพิ่มกิจกรรมของคุณ
+            </a>
+
             <form action="search" method="get">
                 <input type="text" name="keyword" />
                 <button type="submit">Search</button>
@@ -32,6 +36,7 @@
                             <button type="submit">เข้าร่วมกิจกรรม</button>
                         </form>
                         <?php
+
                         // ()ตรวจสอบว่า user ที่ล็อกอินอยู่เป็นเจ้าของกิจกรรมหรือไม่
                         if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $row['user_id']):
                         ?>
