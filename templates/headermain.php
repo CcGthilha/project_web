@@ -5,5 +5,5 @@
     <a href="/main">หน้าแรก</a>
     <a href="/personal">ข้อมูลส่วนตัว</a>
     <a href="/events">กิจกรรม</a>
-    <a href="/logout">ออกจากระบบ</a>
+    <a href="/">ออกจากระบบ</a>
 </nav>
