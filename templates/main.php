@@ -31,18 +31,6 @@
 
                         <p><?= $row['start_date'] ?></p>
                         <button onclick="window.location.href='event-detail?id=<?= $row['event_id'] ?>'">ดูรายละเอียด</button>
-                        <?php
-                        // ()ตรวจสอบว่า user ที่ล็อกอินอยู่เป็นเจ้าของกิจกรรมหรือไม่
-                        if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != $row['user_id']):
-                        ?>
-
-                            <form action="join-event" method="post">
-                                <input type="hidden" name="event_id" value="<?= $row['event_id'] ?>">
-                                <button type="submit">เข้าร่วมกิจกรรม</button>
-                            </form>
-
-                        <?php endif; ?>
-
                     </div>
                 <?php } while ($row = $data['result']->fetch_assoc()); // ดึงข้อมูลถัดไปจนกว่าจะหมด 
                 ?>

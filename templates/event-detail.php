@@ -4,10 +4,8 @@
 
 <body>
     <?php include 'headermain.php' ?>
-    <main>
+    <main style="padding: 20px;">
         <?php
-        // ลบบรรทัดที่ fetch เดิมออก เพราะเรา fetch มาจาก Route แล้ว
-        // ดึงค่าจาก $data['event'] ที่ส่งมาจาก renderView ใน Route
         $event = $data['event'];
         ?>
 
@@ -29,24 +27,32 @@
             <p>สถานที่: <?= $event['location'] ?></p>
             <p>เริ่มวันที่: <?= date('F j, Y', strtotime($event['start_date'])) ?></p>
             <p>สิ้นสุดวันที่: <?= date('F j, Y', strtotime($event['end_date'])) ?></p>
+            
             <?php
-            // ()ตรวจสอบว่า user ที่ล็อกอินอยู่เป็นเจ้าของกิจกรรมหรือไม่
+           
             if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $event['user_id']):
             ?>
-
                 <div class="actions" style="margin-top: 10px; display: flex; gap: 10px;">
                     <a href="/edit-event?id=<?= $event['event_id'] ?>" style="color: blue;">แก้ไขกิจกรรม</a>
 
                     <a href="/delete-event?id=<?= $event['event_id'] ?>" 
-                    style="color: red;" 
-                    onclick="return confirm('ลบไหม?')">ลบกิจกรรม</a>
+                       style="color: red;" 
+                       onclick="return confirm('ลบไหม?')">ลบกิจกรรม</a>
                 </div>
 
-            <?php endif; ?>
-            <!-- เพิ่มปุ่มเข้าร่วมกิจกรรม -->
+            <?php else: ?>
+                <form action="/join-event" method="post" style="margin-top: 15px;">
+                    <input type="hidden" name="event_id" value="<?= $event['event_id'] ?>">
+                    <button type="submit" style="padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        เข้าร่วมกิจกรรม
+                    </button>
+                </form>
+            <?php endif; // ปิดเงื่อนไขเช็คเจ้าของกิจกรรม ?>
+
         <?php else: ?>
-            <p>ไม่พบข้อมูลกิจกรรม</p>
-        <?php endif; ?>
+            <p style="color: red;">ไม่พบข้อมูลกิจกรรม</p>
+        <?php endif; // ปิดเงื่อนไขเช็คว่ามีข้อมูล $event ไหม ?>
+
     </main>
     <?php include 'footer.php' ?>
 </body>
