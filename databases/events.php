@@ -39,10 +39,26 @@ function getEventByKeyword(string $keyword): mysqli_result|bool
 function getEventsById(int $id): mysqli_result|bool
 {
     global $conn;
-    $sql = 'select * from events e join users u on e.user_id = u.user_id join event_images ei on e.event_id = ei.event_id where e.event_id = ?';
+    
+    $sql = 'select * from events e 
+            join users u on e.user_id = u.user_id 
+            left join event_images ei on e.event_id = ei.event_id 
+            where e.event_id = ?';
+            
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('i', $id);
     $stmt->execute();
-    $result = $stmt->get_result();
-    return $result;
+    return $stmt->get_result();
+}
+
+function updateEvent($event_id, $title, $description, $location, $start_date, $end_date): bool
+{
+    global $conn;
+    $sql = "UPDATE events SET title = ?, description = ?, location = ?, start_date = ?, end_date = ? WHERE event_id = ?";
+    
+    $stmt = $conn->prepare($sql);
+    // sssssi คือ String 5 ตัว, Integer 1 ตัว (event_id)
+    $stmt->bind_param('sssssi', $title, $description, $location, $start_date, $end_date, $event_id);
+    
+    return $stmt->execute();
 }
