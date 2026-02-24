@@ -1,39 +1,55 @@
 <?php
+// ไฟล์: FinalProject/routes/edit-event.php
+
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $event_id = $_GET['id'] ?? 0;
-    
-    // ดึงข้อมูลกิจกรรม
     $result = getEventsById($event_id);
-    $event_data = $result->fetch_assoc();
+    $images = [];
+    $event_data = null;
 
-    // เช็คความปลอดภัย
+    while ($row = $result->fetch_assoc()) {
+        if (!$event_data) $event_data = $row;
+        if (isset($row['image_id']) && $row['image_id']) {
+            $images[$row['image_id']] = $row['image_path'];
+        }
+    }
+
     if (!$event_data || $event_data['user_id'] != $_SESSION['user_id']) {
-        echo "<script>alert('คุณไม่มีสิทธิ์แก้ไขกิจกรรมนี้'); window.location.href='/events';</script>";
+        echo "<script>alert('ไม่มีสิทธิ์เข้าถึง'); window.location.href='/events';</script>";
         exit();
     }
 
-    // ** ส่งข้อมูลผ่าน renderView แทนการ require **
     renderView('edit-event', [
         'title' => 'แก้ไขกิจกรรม',
-        'event' => $event_data // ส่งข้อมูลกิจกรรมที่ดึงมาได้ ไปในชื่อ 'event'
+        'event' => $event_data,
+        'images' => $images
     ]);
 
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // กรณีผู้ใช้แก้ไขข้อมูลเสร็จแล้วกด "บันทึก"
     $event_id = $_POST['event_id'];
-    $title = $_POST['title'];
-    $description = $_POST['description'];
-    $location = $_POST['location'];
-    $start_date = $_POST['start_date'];
-    $end_date = $_POST['end_date'];
 
-    $result = getEventsById($event_id);
-    $event_data = $result->fetch_assoc();
-    
-    if ($event_data['user_id'] == $_SESSION['user_id']) {
-        updateEvent($event_id, $title, $description, $location, $start_date, $end_date);
-        header('Location: /events');
-        exit();
+    // 1. ลบรูปที่ผู้ใช้ติ๊กเลือก
+    if (isset($_POST['delete_images'])) {
+        foreach ($_POST['delete_images'] as $image_id) {
+            deleteImageById((int)$image_id);
+        }
     }
+
+    // 2. อัปโหลดรูปใหม่เพิ่มเติม
+    if (isset($_FILES['new_images']) && !empty($_FILES['new_images']['name'][0])) {
+        $upload_dir = '../public/uploads/';
+        foreach ($_FILES['new_images']['tmp_name'] as $key => $tmp_name) {
+            if ($_FILES['new_images']['error'][$key] === UPLOAD_ERR_OK) {
+                $file_name = time() . '_edit_' . $key . '_' . basename($_FILES['new_images']['name'][$key]);
+                if (move_uploaded_file($tmp_name, $upload_dir . $file_name)) {
+                    addEventImage($event_id, '/uploads/' . $file_name);
+                }
+            }
+        }
+    }
+
+    // 3. อัปเดตข้อมูลตัวอักษร
+    updateEvent($event_id, $_POST['title'], $_POST['description'], $_POST['location'], $_POST['start_date'], $_POST['end_date']);
+    header('Location: /events');
+    exit();
 }
-?>
