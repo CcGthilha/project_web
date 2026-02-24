@@ -37,9 +37,9 @@
                 <div class="actions" style="margin-top: 10px; display: flex; gap: 10px;">
                     <a href="/edit-event?id=<?= $event['event_id'] ?>" style="color: blue;">แก้ไขกิจกรรม</a>
 
-                    <a href="/delete-event?id=<?= $event['event_id'] ?>" 
-                    style="color: red;" 
-                    onclick="return confirm('ลบไหม?')">ลบกิจกรรม</a>
+                    <a href="/delete-event?id=<?= $event['event_id'] ?>"
+                        style="color: red;"
+                        onclick="return confirm('ลบไหม?')">ลบกิจกรรม</a>
                 </div>
 
             <?php endif; ?>

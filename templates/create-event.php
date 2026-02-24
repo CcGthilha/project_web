@@ -12,11 +12,13 @@
     <main style="padding: 20px;">
         <h1><?= $data['title'] ?></h1>
 
-        <form action="/create-event" method="POST" style="display: flex; flex-direction: column; max-width: 500px; gap: 10px;" 
-        enctype="multipart/form-data">
-            <label for="image">รูปภาพหน้าปกกิจกรรม (ถ้ามี):</label>
-            <input type="file" id="image" name="image" accept="image/*">
+        <form action="/create-event" method="POST" style="display: flex; flex-direction: column; max-width: 500px; gap: 10px;"
+            enctype="multipart/form-data">
+            <label for="cover_image">รูปภาพหน้าปกกิจกรรม (1 รูป):</label>
+            <input type="file" id="cover_image" name="cover_image" accept="image/*" required>
 
+            <label for="gallery_images">รูปภาพเพิ่มเติม (ถ้ามีสามารถเลือกได้หลายรูป):</label>
+            <input type="file" id="gallery_images" name="gallery_images[]" accept="image/*" multiple>
             <label for="title">ชื่อกิจกรรม:</label>
             <input type="text" id="title" name="title" placeholder="ใส่ชื่อกิจกรรมของคุณ" required>
 

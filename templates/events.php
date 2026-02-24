@@ -5,39 +5,32 @@
 <body>
     <?php include 'headermain.php' ?>
     <main>
-        <?php
-        $row = $data['result']->fetch_assoc();
-        if ($row): // ตรวจสอบว่ามีข้อมูลใน $row หรือไม่
-        ?>
-            <h1><?= $data['title'] ?></h1>
-            <div class="events" style="display: flex;">
-                <?php do { ?>
-                    <div class="event " style="display: flex; flex-direction: column; border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
-                        <h2><?php echo $row['title']; ?></h2>
+        <h1><?= $data['title'] ?></h1>
+        <div class="events" style="display: flex; flex-wrap: wrap; gap: 20px;">
+            <?php if (!empty($data['events'])): ?>
+                <?php foreach ($data['events'] as $event): ?>
+                    <div class="event" style="border: 1px solid #ccc; padding: 15px; width: 300px;">
+                        <h2><?= htmlspecialchars($event['title']) ?></h2>
+                        <img src="<?= $event['image_path'] ?: 'path/to/default.jpg' ?>" style="width: 100%;">
 
-                        <img src="<?= $row['image_path'] ?: 'path/to/default-image.jpg' ?>" alt="<?= $row['title'] ?>" style="width: 200px; height: auto;">
-                        <p>จัดโดย: <?= $row['name']; ?></p>
-                        <p>รายละเอียด: <?= $row['description']; ?></p>
-                        <p>สถานที่: <?= $row['location']; ?></p>
-                        <p>เริ่มวันที่: <?= $row['start_date']; ?></p>
-                        <p>สิ้นสุดวันที่: <?= $row['end_date']; ?></p>
-                        <?php
-                        // เช็คสิทธิ์และแสดงปุ่ม โดยใช้ตัวแปร $row (แก้กลับให้ถูกต้องแล้ว)
-                        if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $row['user_id']):
-                        ?>
-                            <div class="actions" style="margin-top: auto; padding-top: 15px; display: flex; gap: 10px; border-top: 1px solid #eee;">
-                                <a href="/edit-event?id=<?= $row['event_id'] ?>" style="color: blue; text-decoration: none;">แก้ไข</a>
+                        <p><strong>สถานที่:</strong> <?= htmlspecialchars($event['location']) ?></p>
+                        <p><strong>วันที่:</strong> <?= date('F j, Y', strtotime($event['start_date'])) ?></p>
 
-                                <a href="/delete-event?id=<?= $row['event_id'] ?>" style="color: red;" onclick="return confirm('ลบกิจกรรมนี้ไหม?')">ลบ</a>
-                            </div>
-                        <?php endif; ?>
+                        <div class="actions" style="margin-top: 15px; display: flex; gap: 10px;">
+                            <a href="/view-participants?id=<?= $event['event_id'] ?>"
+                                style="background-color: #007bff; color: white; padding: 5px 10px; text-decoration: none; border-radius: 3px;">
+                                ดูรายชื่อผู้ขอเข้าร่วม
+                            </a>
+
+                            <a href="/edit-event?id=<?= $event['event_id'] ?>" style="color: blue;">แก้ไข</a>
+                            <a href="/delete-event?id=<?= $event['event_id'] ?>" style="color: red;" onclick="return confirm('ลบกิจกรรมนี้?')">ลบ</a>
+                        </div>
                     </div>
-                <?php } while ($row = $data['result']->fetch_assoc()); // ดึงข้อมูลถัดไปจนกว่าจะหมด 
-                ?>
-            </div>
-        <?php else: ?>
-            <h1>ไม่พบกิจกรรม</h1>
-        <?php endif; ?>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <p>คุณยังไม่ได้สร้างกิจกรรมใดๆ</p>
+            <?php endif; ?>
+        </div>
     </main>
     <?php include 'footer.php' ?>
 </body>
