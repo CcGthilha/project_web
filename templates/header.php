@@ -4,5 +4,5 @@
 <nav>
     <a href="/">หน้าแรก</a>
     <a href="/login">เข้าสู่ระบบ</a>
-    <a href="/signup">ลงทะเบียน</a>
+    <a href="/signup">สมัครสมาชิก</a>
 </nav>

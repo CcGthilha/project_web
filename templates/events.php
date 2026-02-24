@@ -9,14 +9,15 @@
         $row = $data['result']->fetch_assoc();
         if ($row): // ตรวจสอบว่ามีข้อมูลใน $row หรือไม่
         ?>
-            <h1>กิจกรรม</h1>
+            <h1><?= $data['title'] ?></h1>
             <div class="events" style="display: flex;">
                 <?php do { ?>
                     <div class="event " style="display: flex; flex-direction: column; border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
                         <h2><?php echo $row['title']; ?></h2>
-                        <img src="<?= $row['image_path'] ?>" alt="asfsf" style="width: 200px; height: auto;">
+                        <img src="<?= $row['image_path'] ?: 'path/to/default-image.jpg' ?>" alt="<?= $row['title'] ?>" style="width: 200px; height: auto;">
                         <p>จัดโดย: <?= $row['name']; ?></p>
                         <p>รายละเอียด: <?= $row['description']; ?></p>
+                        <p>สถานที่: <?= $row['location']; ?></p>
                         <p>เริ่มวันที่: <?= $row['start_date']; ?></p>
                         <p>สิ้นสุดวันที่: <?= $row['end_date']; ?></p>
                     </div>

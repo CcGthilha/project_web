@@ -13,10 +13,9 @@ const INDEX_ROUNTE = 'home';
 
 // ฟังชันสำหรับทำให้ URI ที่ร้องขอเข้ามาอยู่ในรูปแบบมาตรฐาน
 function normalizeUri(string $uri): string
-
 {
     // แยกเอาเฉพาะ path ก่อนเครื่องหมาย ?
-    $uri = explode('?', $uri)[0]; 
+    $uri = strtok($uri, '?'); 
     $uri = strtolower(trim($uri, '/'));
     return $uri == INDEX_URI ? INDEX_ROUNTE : $uri;
 } 

@@ -17,12 +17,12 @@ function checkLogin(string $email, string $password): array|null // เปลี
 {
     global $conn;
     // ปรับ Query ให้ดึงข้อมูลทั้งหมด เพื่อเอา user_id ออกมาด้วย
-    $sql = 'select * from users where email = ?'; 
+    $sql = 'select * from users where email = ?';
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('s', $email);
     $stmt->execute();
     $result = $stmt->get_result();
-    
+
     if ($result && $result->num_rows > 0) {
         $row = $result->fetch_assoc();
         // ตรวจสอบรหัสผ่าน
@@ -52,4 +52,39 @@ function updateUserPassword(int $id, string $hashed_password): bool
     $stmt->bind_param('si', $hashed_password, $id);
     $stmt->execute();
     return  $stmt->affected_rows > 0;
+}
+
+function insertUser($data)
+{
+    global $conn;
+
+    // 🔎 เช็ค email ซ้ำก่อน
+    $check = $conn->prepare("SELECT user_id FROM users WHERE email = ?");
+    $check->bind_param("s", $data['email']);
+    $check->execute();
+    $check->store_result();
+
+    if ($check->num_rows > 0) {
+        return "email_exists";
+    }
+
+    // ✅ ถ้าไม่ซ้ำค่อย insert
+    $stmt = $conn->prepare("
+        INSERT INTO users 
+        (name, gender, birth_date, occupation, province, email, password)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    ");
+
+    $stmt->bind_param(
+        "sssssss",
+        $data['name'],
+        $data['gender'],
+        $data['birth_date'],
+        $data['occupation'],
+        $data['province'],
+        $data['email'],
+        $data['password']
+    );
+
+    return $stmt->execute();
 }
