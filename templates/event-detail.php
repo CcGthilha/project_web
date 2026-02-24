@@ -44,7 +44,7 @@
                 <form action="/join-event" method="post" style="margin-top: 15px;">
                     <input type="hidden" name="event_id" value="<?= $event['event_id'] ?>">
                     <button type="submit" style="padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                        เข้าร่วมกิจกรรม
+                        ขอเข้าร่วมกิจกรรม
                     </button>
                 </form>
             <?php endif; // ปิดเงื่อนไขเช็คเจ้าของกิจกรรม ?>
