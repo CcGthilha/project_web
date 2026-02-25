@@ -29,6 +29,7 @@
             ?>
                     <div style="border: 1px solid #000; padding: 10px; margin-bottom: 10px; width: 300px; display: inline-block; vertical-align: top;">
 
+                        <img src="<?= $row['image_path'] ?>" alt="รูปภาพกิจกรรม" style="width: 100%; height: auto;">
                         <h3><?= htmlspecialchars($row['title']) ?></h3>
                         <p>ผู้จัด: <?= htmlspecialchars($row['creator_name']) ?></p>
                         <p>วันที่เริ่ม: <?= date('d M Y', strtotime($row['start_date'])) ?></p>
