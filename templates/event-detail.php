@@ -26,8 +26,8 @@
             <p>ชื่อกิจกรรม: <?= htmlspecialchars($event['title']) ?></p>
             <p>รายละเอียด: <?= htmlspecialchars($event['description']) ?></p>
             <p>สถานที่: <?= htmlspecialchars($event['location']) ?></p>
-            <p>เริ่มวันที่: <?= date('F j, Y', strtotime($event['start_date'])) ?></p>
-            <p>สิ้นสุดวันที่: <?= date('F j, Y', strtotime($event['end_date'])) ?></p>
+            <p>เริ่มวันที่: <?= date('F j, Y - H:i', strtotime($event['start_date'])) ?> น.</p>
+            <p>ถึงวันที่: <?= date('F j, Y - H:i', strtotime($event['end_date'])) ?> น.</p>
 
             <?php
             // ตรวจสอบสิทธิ์: ถ้าเป็นเจ้าของกิจกรรม ให้แสดงปุ่มแก้ไข/ลบ
