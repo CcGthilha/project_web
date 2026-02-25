@@ -1,11 +1,18 @@
 <?php
 $result = [];
 $keyword = $_GET['keyword'] ?? '';
-if ($keyword == '') {    
-    // ดึงข้อมูลกิจกรรมทั้งหมด
-    $result = getEvent();
-}else {
-    // ค้นหาข้อมูลกิจกรรมตามคำค้นหา
+$start_date = $_GET['start_date'] ?? '';
+$end_date = $_GET['end_date'] ?? '';
+
+if ($start_date != '' && $end_date != '') {
+    // กรณีค้นหาตามช่วงวัน
+    $result = getEventByDateRange($start_date, $end_date);
+} elseif ($keyword != '') {
+    // กรณีค้นหาตาม Keyword (โค้ดเดิม)
     $result = getEventByKeyword($keyword);
+} else {
+    // ดึงข้อมูลทั้งหมด (โค้ดเดิม)
+    $result = getEvent();
 }
-renderView('main', ['title' => 'สวัสดีจ้า', 'result' => $result]);
+
+renderView('main', ['title' => 'ผลการค้นหา', 'result' => $result]);

@@ -16,6 +16,14 @@
                 <input type="text" name="keyword" />
                 <button type="submit">Search</button>
             </form>
+            <form method="GET" action="search"> <label>จากวันที่:</label>
+                <input type="date" name="start_date" required>
+
+                <label>ถึงวันที่:</label>
+                <input type="date" name="end_date" required>
+
+                <button type="submit">ค้นหา</button>
+            </form>
 
             <div class="events" style="display: flex; flex-wrap: wrap; gap: 10px;">
                 <?php do { ?>

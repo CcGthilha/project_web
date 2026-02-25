@@ -153,3 +153,24 @@ function deleteImageById(int $image_id): bool
     return $stmt_del->execute();
 }
 
+function getEventByDateRange(string $start_date, string $end_date): mysqli_result|bool
+{
+    global $conn;
+    // ใช้ BETWEEN เพื่อดึงข้อมูลกิจกรรมที่อยู่ในช่วงวันที่กำหนด
+    $sql = 'SELECT e.*, u.name, ei.image_path 
+            FROM events e 
+            JOIN users u ON e.user_id = u.user_id 
+            LEFT JOIN event_images ei ON e.event_id = ei.event_id 
+            WHERE e.start_date BETWEEN ? AND ?
+            GROUP BY e.event_id 
+            ORDER BY e.start_date ASC';
+            
+    $stmt = $conn->prepare($sql);
+    // กำหนดเวลาให้ครอบคลุมทั้งวัน (00:00:00 ถึง 23:59:59)
+    $full_start = $start_date . " 00:00:00";
+    $full_end = $end_date . " 23:59:59";
+    
+    $stmt->bind_param('ss', $full_start, $full_end);
+    $stmt->execute();
+    return $stmt->get_result();
+}
