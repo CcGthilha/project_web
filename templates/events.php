@@ -14,7 +14,8 @@
                         <img src="<?= $event['image_path'] ?: 'path/to/default.jpg' ?>" style="width: 100%;">
 
                         <p><strong>สถานที่:</strong> <?= htmlspecialchars($event['location']) ?></p>
-                        <p><strong>วันที่:</strong> <?= date('F j, Y', strtotime($event['start_date'])) ?></p>
+                        <p><strong>วันที่เริ่ม:</strong> <?= date('F j, Y - H:i', strtotime($event['start_date'])) ?>น.</p>
+                        <p><strong>วันที่สิ้นสุด:</strong> <?= date('F j, Y - H:i', strtotime($event['end_date'])) ?> น.</p>
 
                         <div class="actions" style="margin-top: 15px; display: flex; gap: 10px;">
                             <a href="/view-participants?id=<?= $event['event_id'] ?>"
