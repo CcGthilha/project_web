@@ -1,7 +1,8 @@
 <?php
 // บังคับว่าต้องล็อกอินก่อนถึงจะสร้างกิจกรรมได้
 if (!isset($_SESSION['user_id'])) {
-    echo "<script>alert('กรุณาล็อกอินก่อนสร้างกิจกรรม'); window.location.href='/login';</script>";
+    echo "<script>alert('กรุณาล็อกอินก่อนสร้างกิจกรรม'); 
+        window.location.href='/login';</script>";
     exit();
 }
 

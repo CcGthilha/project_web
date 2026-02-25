@@ -6,14 +6,14 @@
 
 <body>
     <header>
-        <?php include 'headermain.php' ?>
+        <?php include 'header.php' ?>
     </header>
 
     <main style="padding: 20px;">
         <h1><?= $data['title'] ?></h1>
 
         <?php
-        // เปลี่ยนมาเช็คว่ามีข้อมูลใน $data['event'] ที่ส่งมาหรือไม่
+        
         if (isset($data['event'])):
             // เอาข้อมูลมาใส่ตัวแปร $row เพื่อให้เรียกใช้โค้ดเดิมด้านล่างได้เลย
             $row = $data['event'];

@@ -4,7 +4,7 @@
 </head>
 <body>
     <header>
-        <?php include 'headermain.php' ?>
+        <?php include 'header.php' ?>
     </header>
 
     <main style="padding: 20px;">

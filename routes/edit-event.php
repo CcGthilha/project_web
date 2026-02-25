@@ -1,5 +1,5 @@
 <?php
-// ไฟล์: FinalProject/routes/edit-event.php
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $event_id = $_GET['id'] ?? 0;
@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
 
     if (!$event_data || $event_data['user_id'] != $_SESSION['user_id']) {
-        echo "<script>alert('ไม่มีสิทธิ์เข้าถึง'); window.location.href='/events';</script>";
+        echo "<script>alert('คุณไม่มีสิทธิ์เข้าถึงกิจกรรมนี้'); window.location.href='/main';</script>";
         exit();
     }
 

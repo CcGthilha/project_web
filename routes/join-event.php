@@ -11,7 +11,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['user_id'])) {
 
     // 2. ถ้ายังไม่เคยเข้าร่วม ถึงจะยอมให้ Insert ข้อมูล
     if (joinEvent($user_id, $event_id)) {
-        echo "<script>alert('เข้าร่วมกิจกรรมสำเร็จ!'); window.location.href='/event-detail?id=$event_id';</script>";
+        // 🌟 ตัวช่วยสำคัญ: หาว่าผู้ใช้กดปุ่มมาจากหน้าเว็บไหน (URL อะไร)
+        if (isset($_SERVER['HTTP_REFERER'])) {
+            $return_url = $_SERVER['HTTP_REFERER'];
+        } else {
+            $return_url = '/main?id=' . $event_id;
+        }
+        echo "<script>alert('เข้าร่วมกิจกรรมสำเร็จ!'); window.location.href='$return_url';</script>";
     } else {
         echo "<script>alert('เกิดข้อผิดพลาดในการส่งคำขอ'); window.history.back();</script>";
     }

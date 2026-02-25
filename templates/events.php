@@ -3,10 +3,10 @@
 <head></head>
 
 <body>
-    <?php include 'headermain.php' ?>
+    <?php include 'header.php' ?>
     <main>
         <h1><?= $data['title'] ?></h1>
-        <div class="events" style="display: flex; flex-wrap: wrap; gap: 20px;">
+        <div class="events" style="display: flex; flex-wrap: wrap; gap: 20px; margin-top: 20px; justify-content: center;">
             <?php if (!empty($data['events'])): ?>
                 <?php foreach ($data['events'] as $event): ?>
                     <div class="event" style="border: 1px solid #ccc; padding: 15px; width: 300px;">
@@ -28,7 +28,11 @@
                     </div>
                 <?php endforeach; ?>
             <?php else: ?>
-                <p>คุณยังไม่ได้สร้างกิจกรรมใดๆ</p>
+                <div style="text-align: center; padding: 50px;">
+                    <p>ยังไม่มีกิจกรรมที่คุณสร้างไว้</p>
+                    <h3>สามารถสร้างกิจกรรมของคุณได้ที่นี่</h3>
+                    <a href="/create-event">+ เพิ่มกิจกรรมของคุณ</a>
+                </div>
             <?php endif; ?>
         </div>
     </main>
