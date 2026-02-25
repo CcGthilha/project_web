@@ -1,8 +1,6 @@
 <?php
-// บังคับเริ่ม Session ถ้ายังไม่ได้เปิด
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+
+session_start();
 
 // ตรวจสอบว่าล็อกอินอยู่ และส่งข้อมูลมาแบบ POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['user_id'])) {

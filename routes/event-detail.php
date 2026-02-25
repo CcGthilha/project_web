@@ -1,7 +1,7 @@
 <?php
+session_start();
 
-
-if (!isset($_SESSION['user_id'])) {
+if (!$_GET['id']) {
     echo "<script>alert('กรุณาล็อกอินก่อนสร้างกิจกรรม'); 
         window.location.href='/login';</script>";
     exit();

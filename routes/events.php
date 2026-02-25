@@ -1,6 +1,5 @@
 <?php
 
-
 if (!isset($_SESSION['user_id'])) {
     echo "<script>alert('กรุณาล็อกอินก่อนสร้างกิจกรรม'); 
         window.location.href='/login';</script>";
