@@ -12,6 +12,7 @@
         <?php if (isset($_SESSION['user_id'])): ?>
             <a href="/list-join-events" style="margin-right: 15px; text-decoration: none; color: #007bff;">กิจกรรมที่คุณเข้าร่วม</a>
             <a href="/events" style="margin-right: 15px; text-decoration: none; color: #007bff;">กิจกรรมของคุณ</a>
+            <a href="/personal" style="margin-right: 15px; text-decoration: none; color: #007bff;">ข้อมูลส่วนตัว</a>
             <a href="/logout" style="text-decoration: none; color: red;" onclick="return confirm('ต้องการออกจากระบบใช่หรือไม่?');">ออกจากระบบ</a>
 
         <?php else: ?>

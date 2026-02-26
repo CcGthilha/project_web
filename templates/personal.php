@@ -3,7 +3,7 @@
 <head></head>
 
 <body>
-    <?php include 'headermain.php' ?>
+    <?php include 'header.php' ?>
     <main>
     <?php while ($row = $data['result']->fetch_object()): ?>
         <?= $row->name ?>
@@ -12,7 +12,8 @@
         <?= $row->birth_date ?>
         <?= $row->province ?>
         <?= $row->occupation ?>
-        <?= $row->created_at ?>
+        <?= date('F j, Y - H:i', strtotime($row->created_at)) ?> น.
+        <a href="/chpw?id=<?= $row->user_id ?>">เปลี่ยนรหัสผ่าน</a>
     <?php endwhile; ?>
 </main>
     <?php include 'footer.php' ?>
