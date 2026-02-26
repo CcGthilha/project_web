@@ -12,7 +12,6 @@
         <?= $row->birth_date ?>
         <?= $row->province ?>
         <?= $row->occupation ?>
-        <?= date('F j, Y - H:i', strtotime($row->created_at)) ?> น.
         <a href="/chpw?id=<?= $row->user_id ?>">เปลี่ยนรหัสผ่าน</a>
     <?php endwhile; ?>
 </main>
