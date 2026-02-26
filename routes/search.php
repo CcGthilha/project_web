@@ -9,10 +9,10 @@ if ($start_date != '' && $end_date != '') {
     // กรณีค้นหาตามช่วงวัน
     $result = getEventByDateRange($start_date, $end_date);
 } elseif ($keyword != '') {
-    // กรณีค้นหาตาม Keyword (โค้ดเดิม)
+    // กรณีค้นหาตาม Keyword
     $result = getEventByKeyword($keyword);
 } else {
-    // ดึงข้อมูลทั้งหมด (โค้ดเดิม)
+    // ดึงข้อมูลทั้งหมด
     $result = getEvent();
 }
 
