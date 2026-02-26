@@ -1,8 +1,8 @@
 <?php
 
 
-if (!isset($_GET['id'])) {
-    header('Location: /students');
+if (!isset($_GET['id']) || empty($_GET['id'])) {
+    renderView('400', ['message' => 'Something went wrong! Missing user ID']);
     exit;
 } else {
     $id = (int)$_GET['id'];
@@ -24,7 +24,7 @@ if (!isset($_GET['id'])) {
             renderView('400', ['message' => 'Something went wrong! on update password']);
             exit;
         }
-    } else {        
+    } else {
         $res = getUserById($id);
         if ($res) {
             renderView('chpw', array('result' => $res));

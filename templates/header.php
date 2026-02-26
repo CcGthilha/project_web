@@ -2,7 +2,7 @@
     <h1>กิจกรรมสร้างได้ด้วยมือเรา</h1>
 </header>
 <nav style="padding: 15px; background-color: #f8f9fa; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center;">
-
+    
     <div>
         <a href="/" style="margin-right: 15px; text-decoration: none; font-weight: bold; color: #333;">หน้าแรก</a>
         <a href="/main" style="margin-right: 15px; text-decoration: none; font-weight: bold; color: #333;">กิจกรรมทั้งหมด</a>
