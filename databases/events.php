@@ -32,7 +32,7 @@ function getEventById(int $id): mysqli_result|bool
 function getEventByKeyword(string $keyword): mysqli_result|bool
 {
     $conn = getConnection();
-    $sql = 'select * from events e join users u on e.user_id = u.user_id join event_images ei on e.event_id = ei.event_id where e.title like ? or u.name like ?';
+    $sql = 'select * from events e join users u on e.user_id = u.user_id join event_images ei on e.event_id = ei.event_id where e.title like ? or u.name like ? GROUP BY e.event_id';
     $stmt = $conn->prepare($sql);
     $keyword = '%' . $keyword . '%';
     $stmt->bind_param('ss', $keyword, $keyword);
@@ -164,12 +164,12 @@ function getEventByDateRange(string $start_date, string $end_date): mysqli_resul
             WHERE e.start_date BETWEEN ? AND ?
             GROUP BY e.event_id 
             ORDER BY e.start_date ASC';
-            
+
     $stmt = $conn->prepare($sql);
     // กำหนดเวลาให้ครอบคลุมทั้งวัน (00:00:00 ถึง 23:59:59)
     $full_start = $start_date . " 00:00:00";
     $full_end = $end_date . " 23:59:59";
-    
+
     $stmt->bind_param('ss', $full_start, $full_end);
     $stmt->execute();
     return $stmt->get_result();
