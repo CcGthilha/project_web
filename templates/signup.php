@@ -47,6 +47,7 @@
 
             if (password.value !== confirmPassword.value) {
                 errorText.textContent = "รหัสผ่านไม่ตรงกัน";
+                errorText.style.color = "red";
             } else {
                 errorText.textContent = "รหัสผ่านตรงกัน ✓";
                 errorText.style.color = "green";
