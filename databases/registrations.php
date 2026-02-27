@@ -96,3 +96,13 @@ function getJoinedEventsByUser(int $user_id, string $status = 'all'): mysqli_res
     $stmt->execute();
     return $stmt->get_result();
 }
+
+// ฟังก์ชันสำหรับอัปเดตสถานะการเข้าร่วม (อนุมัติ/ปฏิเสธ) สำหรับไฟล์ manage-registrations.php
+function updateRegistrationStatus(int $reg_id, string $status): bool
+{
+    global $conn;
+    $sql = "UPDATE registrations SET status = ? WHERE registrations_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param('si', $status, $reg_id);
+    return $stmt->execute();
+}

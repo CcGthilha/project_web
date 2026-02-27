@@ -44,10 +44,10 @@
             // ถ้าไม่ใช่เจ้าของกิจกรรม และล็อกอินอยู่
             elseif (isset($_SESSION['user_id'])):
 
-                // 1. เรียกใช้ฟังก์ชันใหม่ที่เราเพิ่งสร้างเพื่อดึงสถานะมา
+                //เรียกใช้ฟังก์ชันใหม่ที่เราเพิ่งสร้างเพื่อดึงสถานะมา
                 $reg_status = getRegistrationStatus($_SESSION['user_id'], $event['event_id']);
 
-                // 2. เช็คสถานะแล้วแสดงข้อความให้ตรงความจริง
+                //เช็คสถานะแล้วแสดงข้อความให้ตรงความจริง
                 if ($reg_status === 'pending'):
                 ?>
                     <div style="display: flex; align-items: center; gap: 10px; margin-top: 15px;">
