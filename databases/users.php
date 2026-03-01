@@ -11,7 +11,6 @@ function getUsers(): mysqli_result|bool
     return $result;
 }
 
-// ไฟล์ FinalProject/databases/users.php
 
 function checkLogin(string $email, string $password): array|null // เปลี่ยน return type
 {
