@@ -1,7 +1,7 @@
 <?php
 
 if (!isset($_SESSION['user_id'])) {
-    echo "<script>alert('กรุณาล็อกอินก่อนสร้างกิจกรรม'); 
+    echo "<script>alert('กรุณาล็อกอินก่อน'); 
         window.location.href='/login';</script>";
     exit();
 }
@@ -9,11 +9,13 @@ if (!isset($_SESSION['user_id'])) {
 $res = getEventById($_SESSION['user_id']); 
 $events_with_participants = [];
 
+// วนลูปผ่านกิจกรรมแต่ละรายการ
 while ($row = $res->fetch_assoc()) {
     $event_id = $row['event_id'];
     // ดึงรายชื่อคนเข้าร่วมของกิจกรรมนี้ (ใช้ฟังก์ชันที่สร้างไว้ใน databases/events.php)
     $participants_res = getParticipantsByEventId($event_id);
     $participants = [];
+    // เก็บรายชื่อคนเข้าร่วมไว้ในอาร์เรย์
     while ($p = $participants_res->fetch_assoc()) {
         $participants[] = $p;
     }

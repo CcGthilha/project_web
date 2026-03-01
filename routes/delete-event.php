@@ -4,14 +4,14 @@
 if (isset($_GET['id'])) {
     $event_id = (int)$_GET['id'];
 
-    // 1. ดึงข้อมูลกิจกรรมมาตรวจสอบก่อนว่าเป็นของใคร
+    // ดึงข้อมูลกิจกรรมมาตรวจสอบก่อนว่าเป็นของใคร
     $result = getEventsById($event_id);
     $event_data = $result->fetch_assoc();
 
-    // 2. เช็คสิทธิ์: ต้องมีข้อมูลกิจกรรมนี้อยู่จริง และ User ID ต้องตรงกับคนที่ล็อกอิน
+    // เช็คสิทธิ์: ต้องมีข้อมูลกิจกรรมนี้อยู่จริง และ User ID ต้องตรงกับคนที่ล็อกอิน
     if ($event_data && isset($_SESSION['user_id']) && $event_data['user_id'] == $_SESSION['user_id']) {
         
-        // 3. สิทธิ์ถูกต้อง สั่งลบกิจกรรมได้เลย
+        // สิทธิ์ถูกต้อง สั่งลบกิจกรรมได้เลย
         if (deleteEvent($event_id)) {
             // ลบสำเร็จ ให้เด้งข้อความแจ้งเตือนและกลับไปหน้าหลัก
             echo "<script>alert('ลบกิจกรรมเรียบร้อยแล้ว!'); window.location.href='/events';</script>";
