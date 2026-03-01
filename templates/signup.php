@@ -9,7 +9,7 @@
         <section>
             <form action="signup" method="post">
                 <label for="name">ชื่อ-สกุล</label><br>
-                <input type="text" name="name" id="name" required/><br>
+                <input type="text" name="name" id="name" required /><br>
                 <label for="gender">เพศ</label><br>
                 <select name="gender" id="gender" required>
                     <option value="male">ชาย</option>
@@ -19,11 +19,11 @@
                 <label for="birth_date" required>วันเกิด</label><br>
                 <input type="date" name="birth_date" id="birth_date" required /><br>
                 <label for="occupation">อาชีพ</label><br>
-                <input type="text" name="occupation" id="occupation"required/><br>
+                <input type="text" name="occupation" id="occupation" required /><br>
                 <label for="province">จังหวัดที่อยู่อาศัย</label><br>
-                <input type="text" name="province" id="province" required/><br>
+                <input type="text" name="province" id="province" required /><br>
                 <label for="email">อีเมล</label><br>
-                <input type="email" name="email" id="email" required/><br>
+                <input type="email" name="email" id="email" required /><br>
                 <label for="password">รหัสผ่าน</label><br>
                 <input type="password" id="password" name="password" required><br>
                 <label for="confirm_password">ยืนยันรหัสผ่าน</label><br>
@@ -56,7 +56,19 @@
 
         password.addEventListener("input", checkPassword);
         confirmPassword.addEventListener("input", checkPassword);
+        // วางไว้ที่ส่วนล่างของ templates/signup.php
+        document.querySelector('form').onsubmit = function(e) {
+            const pass = document.getElementById('password').value;
+            const confirmPass = document.getElementById('confirm_password').value;
+
+            if (pass !== confirmPass) {
+                alert("รหัสผ่านไม่ตรงกัน กรุณาตรวจสอบอีกครั้ง");
+                e.preventDefault(); // สั่งระงับการส่งฟอร์ม (Submit)
+                return false;
+            }
+        };
     </script>
+
 </body>
 
 </html>

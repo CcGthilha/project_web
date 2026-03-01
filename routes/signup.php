@@ -26,4 +26,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         echo "Error inserting user.";
     }
+} else {
+    renderView('signup', ['title' => 'สมัครสมาชิก']);
 }
