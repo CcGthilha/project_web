@@ -1,4 +1,5 @@
 <?php
+// routes/signup-success.php
 if (insertUser($user)) {
     renderView('signup-success', ['title' => 'สมัครสมาชิกสำเร็จ']); 
 }

@@ -63,7 +63,7 @@
 
             if (pass !== confirmPass) {
                 alert("รหัสผ่านไม่ตรงกัน กรุณาตรวจสอบอีกครั้ง");
-                e.preventDefault(); // สั่งระงับการส่งฟอร์ม (Submit)
+                e.preventDefault(); 
                 return false;
             }
         };
