@@ -67,11 +67,7 @@
 
             if (pass !== confirmPass) {
                 alert("รหัสผ่านไม่ตรงกัน กรุณาตรวจสอบอีกครั้ง");
-<<<<<<< HEAD
-                e.preventDefault(); 
-=======
                 e.preventDefault();
->>>>>>> c7751dc32b323978e065351513328fbbb6fa3c9c
                 return false;
             }
         };

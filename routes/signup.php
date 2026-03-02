@@ -1,9 +1,5 @@
 <?php
 // routes/signup.php
-<<<<<<< HEAD
-=======
-
->>>>>>> c7751dc32b323978e065351513328fbbb6fa3c9c
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // 1. เช็คว่ารหัสผ่านตรงกันหรือไม่ (Confirm Password)
@@ -15,30 +11,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-<<<<<<< HEAD
-    // ดึงค่าชื่อและอีเมลมาก่อนเพื่อใช้ตรวจสอบ
-    $name = $_POST['name'] ?? '';
-    $email = $_POST['email'] ?? '';
-
-    //  เช็คว่าชื่อหรืออีเมลซ้ำกับในระบบหรือไม่ 🌟
-    if (checkDuplicateUser($name, $email)) {
-        renderView('signup', [
-            'title' => 'สมัครสมาชิก',
-            'error' => 'ชื่อหรืออีเมลนี้มีผู้ใช้งานแล้ว กรุณาใช้ข้อมูลอื่น'
-        ]);
-        exit; // หยุดการทำงานทันที ป้องกันการบันทึกข้อมูลซ้ำ
-    }
-
-    // 3. ถ้าผ่านเงื่อนไข ค่อยนำข้อมูลมาเตรียมบันทึก
-=======
->>>>>>> c7751dc32b323978e065351513328fbbb6fa3c9c
+    // 🌟 ดึงข้อมูลจาก $_POST โดยตรงเลย (แก้ปัญหาตัวแปรหาย) 🌟
     $user = [
-        'name' => $name, // ใช้ตัวแปรที่ประกาศไว้ด้านบนได้เลย
+        'name' => $_POST['name'] ?? '', 
         'gender' => $_POST['gender'] ?? '',
         'birth_date' => $_POST['birth_date'] ?? '',
         'occupation' => $_POST['occupation'] ?? '',
         'province' => $_POST['province'] ?? '',
-        'email' => $email, // ใช้ตัวแปรที่ประกาศไว้ด้านบนได้เลย
+        'email' => $_POST['email'] ?? '', 
         'password' => password_hash($_POST['password'], PASSWORD_DEFAULT),
     ];
 
@@ -52,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // แจ้งเตือนกรณีอีเมลซ้ำที่ Model ดักไว้
         renderView('signup', [
             'title' => 'สมัครสมาชิก',
-            'error' => 'อีเมลนี้ถูกใช้งานไปแล้ว กรุณาใช้อีเมลอื่น'
+            'error' => 'ชื่อหรืออีเมลนี้ถูกใช้งานไปแล้ว กรุณาใช้ข้อมูลอื่น'
         ]);
     } else {
         // กรณี Error อื่นๆ
@@ -65,3 +45,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // สำหรับการเข้าหน้าสมัครสมาชิกปกติ (GET Method)
     renderView('signup', ['title' => 'สมัครสมาชิก']);
 }
+?>
