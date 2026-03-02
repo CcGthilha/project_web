@@ -40,7 +40,7 @@
         const errorText = document.getElementById('password-error');
 
         function checkPassword() {
-            if (confirmPassword.value === "") {
+            if (confirmPassword.value === "" || password.value === "") {
                 errorText.textContent = "";
                 return;
             }
@@ -56,14 +56,13 @@
 
         password.addEventListener("input", checkPassword);
         confirmPassword.addEventListener("input", checkPassword);
-        // วางไว้ที่ส่วนล่างของ templates/signup.php
         document.querySelector('form').onsubmit = function(e) {
             const pass = document.getElementById('password').value;
             const confirmPass = document.getElementById('confirm_password').value;
 
             if (pass !== confirmPass) {
                 alert("รหัสผ่านไม่ตรงกัน กรุณาตรวจสอบอีกครั้ง");
-                e.preventDefault(); // สั่งระงับการส่งฟอร์ม (Submit)
+                e.preventDefault();
                 return false;
             }
         };

@@ -15,7 +15,7 @@ require_once INCLUDES_DIR . '/view.php';
 require_once INCLUDES_DIR . '/database.php';
 
 // เรียก database ฟังก์ชันเพื่อเชื่อมต่อฐานข้อมูล (ถ้าจำเป็น)
-$conn = getConnection();
+
 
 
 // ทุกครั้งที่มีการร้องขอเข้ามา ให้เรียกใช้ฟังก์ชัน dispatch

@@ -4,10 +4,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['email'] ?? '';
     $password = $_POST['password'] ?? '';
 
-    $user = checkLogin($username, $password); // เรียกใช้ฟังก์ชันตรวจสอบการล็อกอิน
+    $user = checkLogin($username, $password); 
     if ($user) {
         $_SESSION['timestamp'] = time();
-        $_SESSION['user_id'] = $user['user_id']; // บันทึก ID ลง Session ตรงนี้
+        $_SESSION['user_id'] = $user['user_id'];
         header('Location: /main');
         exit;
     } else {
