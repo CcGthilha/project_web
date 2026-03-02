@@ -6,6 +6,11 @@
     <?php include 'header.php' ?>
     <main>
         <h1><?= $data['title'] ?></h1>
+        <?php if (isset($data['error'])): ?>
+            <div style="color: red; background: #ffeeee; padding: 10px; margin-bottom: 15px; border: 1px solid red; border-radius: 5px;">
+                ⚠️ <?= $data['error'] ?>
+            </div>
+        <?php endif; ?>
         <section>
             <form action="signup" method="post">
                 <label for="name">ชื่อ-สกุล</label><br>
