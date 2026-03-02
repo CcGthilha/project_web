@@ -1,12 +1,11 @@
 <?php
-
 if (!isset($_SESSION['user_id'])) {
     echo "<script>alert('กรุณาล็อกอินก่อน'); 
         window.location.href='/login';</script>";
     exit();
 }
 // ดึงกิจกรรมทั้งหมดของผู้ใช้ที่ล็อกอินอยู่
-$res = getEventById($_SESSION['user_id']); 
+$res = getEventsByUserId($_SESSION['user_id']); 
 $events_with_participants = [];
 
 // วนลูปผ่านกิจกรรมแต่ละรายการ

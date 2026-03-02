@@ -5,7 +5,7 @@ if (isset($_GET['id'])) {
     $event_id = (int)$_GET['id'];
 
     // ดึงข้อมูลกิจกรรมมาตรวจสอบก่อนว่าเป็นของใคร
-    $result = getEventsById($event_id);
+    $result = getEventByEventId($event_id);
     $event_data = $result->fetch_assoc();
 
     // เช็คสิทธิ์: ต้องมีข้อมูลกิจกรรมนี้อยู่จริง และ User ID ต้องตรงกับคนที่ล็อกอิน

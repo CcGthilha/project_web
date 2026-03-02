@@ -2,7 +2,7 @@
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $event_id = $_GET['id'] ?? 0;
-    $result = getEventsById($event_id);
+    $result = getEventByEventId($event_id);
     $images = [];
     $event_data = null;
 

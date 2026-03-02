@@ -6,6 +6,11 @@
     <?php include 'header.php' ?>
     <main>
         <h1><?= $data['title'] ?></h1>
+        <?php if (isset($data['error'])): ?>
+            <div style="color: red; background: #ffeeee; padding: 10px; margin-bottom: 15px; border: 1px solid red; border-radius: 5px;">
+                ⚠️ <?= $data['error'] ?>
+            </div>
+        <?php endif; ?>
         <section>
             <form action="signup" method="post">
                 <label for="name">ชื่อ-สกุล</label><br>
@@ -40,7 +45,7 @@
         const errorText = document.getElementById('password-error');
 
         function checkPassword() {
-            if (confirmPassword.value === "") {
+            if (confirmPassword.value === "" || password.value === "") {
                 errorText.textContent = "";
                 return;
             }
@@ -56,14 +61,17 @@
 
         password.addEventListener("input", checkPassword);
         confirmPassword.addEventListener("input", checkPassword);
-        // วางไว้ที่ส่วนล่างของ templates/signup.php
         document.querySelector('form').onsubmit = function(e) {
             const pass = document.getElementById('password').value;
             const confirmPass = document.getElementById('confirm_password').value;
 
             if (pass !== confirmPass) {
                 alert("รหัสผ่านไม่ตรงกัน กรุณาตรวจสอบอีกครั้ง");
+<<<<<<< HEAD
                 e.preventDefault(); 
+=======
+                e.preventDefault();
+>>>>>>> c7751dc32b323978e065351513328fbbb6fa3c9c
                 return false;
             }
         };

@@ -19,7 +19,7 @@
             <button type="submit" style="margin-top: 10px; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">เข้าสู่ระบบ</button>
             
         </form>
-        <p style="margin-top: 15px;">ยังไม่มีบัญชี? <a href="/register">สมัครสมาชิก</a></p>
+        <p style="margin-top: 15px;">ยังไม่มีบัญชี? <a href="/signup">สมัครสมาชิก</a></p>
     </main>
     <!-- ส่วนแสดงผลหลักของหน้า -->
 
