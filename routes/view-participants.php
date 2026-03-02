@@ -6,7 +6,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $event_id = (int)$_GET['id'];
-$res = getEventsById($event_id);
+$res = getEventByEventId($event_id);
 $event = $res->fetch_assoc();
 
 // เช็คสิทธิ์ว่าเป็นเจ้าของกิจกรรมหรือไม่

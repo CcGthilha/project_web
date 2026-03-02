@@ -22,13 +22,12 @@ require_once INCLUDES_DIR . '/database.php';
 dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);
 
 // ควบคุมการเข้าถึงหน้าเว็บด้วย session (ตัวอย่างการใช้งาน)
-// const PUBLIC_ROUTES = ['/', '/login','/signup'];
+// const PUBLIC_ROUTES = ['/', '/login', '/signup'];
 
 // if (in_array(strtolower($_SERVER['REQUEST_URI']), PUBLIC_ROUTES)) {
 //     dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);
 //     exit;
-// } elseif (isset($_SESSION['timestamp']) && time() - $_SESSION['timestamp'] < 1000) {
-//     // 10 Sec.
+// } elseif (isset($_SESSION['timestamp']) && time() - $_SESSION['timestamp'] < 1800) { // ตัวอย่างการตรวจสอบ session ว่ายังไม่หมดอายุ (1000 วินาที)
 //     $unix_timestamp = time();
 //     $_SESSION['timestamp'] = $unix_timestamp;
 //     dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);

@@ -6,7 +6,7 @@ if (!$_GET['id']) {
 }
 
 $event_id = (int)$_GET['id'];
-$res = getEventsById($event_id);
+$res = getEventByEventId($event_id);
 $images = [];
 $eventInfo = null;
 

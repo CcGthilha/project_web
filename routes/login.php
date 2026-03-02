@@ -6,7 +6,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $user = checkLogin($username, $password); 
     if ($user) {
-        $_SESSION['timestamp'] = time();
         $_SESSION['user_id'] = $user['user_id'];
         header('Location: /main');
         exit;

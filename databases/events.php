@@ -12,7 +12,7 @@ function getEvent(): mysqli_result|bool
     $stmt->execute();
     return $stmt->get_result();
 }
-function getEventById(int $id): mysqli_result|bool
+function getEventsByUserId(int $id): mysqli_result|bool
 {
     global $conn;
     $sql = 'select e.*, u.name, ei.image_path from events e 
@@ -41,7 +41,7 @@ function getEventByKeyword(string $keyword): mysqli_result|bool
     return $result;
 }
 
-function getEventsById(int $id): mysqli_result|bool
+function getEventByEventId(int $id): mysqli_result|bool
 {
     global $conn;
     $sql = 'select e.*, u.name, ei.image_path, ei.image_id from events e 
