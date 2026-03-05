@@ -1,9 +1,6 @@
 <!DOCTYPE html>
 <html>
 
-<head>
-</head>
-
 <body>
     <header>
         <?php include 'header.php' ?>

@@ -1,6 +1,5 @@
 <html>
-
-<head></head>
+<!-- tempplates/event-detail.php -->
 
 <body>
     <?php include 'header.php' ?>
@@ -39,7 +38,12 @@
                         style="color: red;"
                         onclick="return confirm('ยืนยันการลบกิจกรรมนี้?')">ลบกิจกรรม</a>
                 </div>
-
+                <form action="/verify-otp" method="post" style="margin-top: 10px;">
+                    <input type="hidden" name="event_id" value="<?= htmlspecialchars($event['event_id']) ?>">
+                    <button type="submit" style="padding: 8px 12px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        ตรวจรหัสเข้างาน (OTP)
+                    </button>
+                </form>
                 <?php
             // ถ้าไม่ใช่เจ้าของกิจกรรม และล็อกอินอยู่
             elseif (isset($_SESSION['user_id'])):
@@ -65,6 +69,10 @@
                         <form action="/cancel-join" method="post" style="margin: 0;">
                             <input type="hidden" name="event_id" value="<?= $event['event_id'] ?>">
                             <button type="submit" style="background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;" onclick="return confirm('แน่ใจหรือไม่ว่าต้องการออกจากการเข้าร่วมกิจกรรมนี้?')">ออกจากการเข้าร่วม</button>
+                        </form>
+                        <form action="/otp-user" method="post" style="margin: 0;">
+                            <input type="hidden" name="event_id" value="<?= $event['event_id'] ?>">
+                            <button type="submit" style="background-color: #007bff; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">แสดงรหัสเข้างาน (OTP)</button>
                         </form>
                     </div>
                 <?php elseif ($reg_status === 'rejected'): ?>
