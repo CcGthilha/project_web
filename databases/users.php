@@ -81,3 +81,23 @@ function insertUser($data)
 
     return $stmt->execute();
 }
+
+function checkDuplicateUser(string $name, string $email): bool 
+{
+    global $conn;
+    
+    // ค้นหาว่ามีชื่อ หรือ อีเมล นี้อยู่ในระบบแล้วหรือยัง
+    $sql = "SELECT user_id FROM users WHERE name = ? OR email = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param('ss', $name, $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    // ถ้าเจอข้อมูลมากกว่า 0 แถว แปลว่า "ซ้ำ" (return true)
+    if ($result->num_rows > 0) {
+        return true; 
+    }
+    
+    // ถ้าไม่เจอเลย แปลว่า "ไม่ซ้ำ" สมัครได้ (return false)
+    return false; 
+}

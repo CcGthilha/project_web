@@ -1,7 +1,7 @@
 <?php
 // routes/signup.php
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
     // 1. เช็คว่ารหัสผ่านตรงกันหรือไม่ (Confirm Password)
     if ($_POST['password'] !== $_POST['confirm_password']) {
         renderView('signup', [
@@ -11,13 +11,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
+    // 🌟 ดึงข้อมูลจาก $_POST โดยตรงเลย (แก้ปัญหาตัวแปรหาย) 🌟
     $user = [
-        'name' => $_POST['name'] ?? '',
+        'name' => $_POST['name'] ?? '', 
         'gender' => $_POST['gender'] ?? '',
         'birth_date' => $_POST['birth_date'] ?? '',
         'occupation' => $_POST['occupation'] ?? '',
         'province' => $_POST['province'] ?? '',
-        'email' => $_POST['email'] ?? '',
+        'email' => $_POST['email'] ?? '', 
         'password' => password_hash($_POST['password'], PASSWORD_DEFAULT),
     ];
 
@@ -31,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // แจ้งเตือนกรณีอีเมลซ้ำที่ Model ดักไว้
         renderView('signup', [
             'title' => 'สมัครสมาชิก',
-            'error' => 'อีเมลนี้ถูกใช้งานไปแล้ว กรุณาใช้อีเมลอื่น'
+            'error' => 'ชื่อหรืออีเมลนี้ถูกใช้งานไปแล้ว กรุณาใช้ข้อมูลอื่น'
         ]);
     } else {
         // กรณี Error อื่นๆ
@@ -44,3 +45,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // สำหรับการเข้าหน้าสมัครสมาชิกปกติ (GET Method)
     renderView('signup', ['title' => 'สมัครสมาชิก']);
 }
+?>
