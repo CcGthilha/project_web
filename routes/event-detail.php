@@ -1,7 +1,12 @@
 <?php
-if (!$_GET['id']) {
-    echo "<script>alert('กรุณาล็อกอินก่อนสร้างกิจกรรม'); 
+if (!$_GET['id'] && !isset($_SESSION['user_id'])) {
+    echo "<script>alert('กรุณาล็อกอินก่อนดูรายละเอียดกิจกรรม'); 
         window.location.href='/login';</script>";
+    exit();
+}
+if (!$_GET['id']) {
+    echo "<script>alert('ไม่พบกิจกรรมนี้ กรุณาสร้างกิจกรรมก่อน'); 
+        window.location.href='/events';</script>";
     exit();
 }
 
