@@ -1,5 +1,5 @@
 <footer>
     <p>
-        &copy; <?= date('Y') ?>. All rights reserved by 4P. //footer.php
+        &copy; <?= date('Y') ?>. All rights reserved by 4P.
     </p>
 </footer>
