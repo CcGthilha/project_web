@@ -1,8 +1,6 @@
 <?php
 // routes/otp-user.php
 
-session_start();
-
 if (!isset($_SESSION['user_id'])) {
     echo "<script>alert('กรุณาล็อกอินก่อนดูรหัสเข้างาน'); 
         window.location.href='/login';</script>";

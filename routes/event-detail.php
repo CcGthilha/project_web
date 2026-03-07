@@ -1,16 +1,16 @@
 <?php
-if (!$_GET['id'] && !isset($_SESSION['user_id'])) {
+if (!$_GET['event_id'] && !isset($_SESSION['user_id'])) {
     echo "<script>alert('กรุณาล็อกอินก่อนดูรายละเอียดกิจกรรม'); 
         window.location.href='/login';</script>";
     exit();
 }
-if (!$_GET['id']) {
+if (!$_GET['event_id'] ) {
     echo "<script>alert('ไม่พบกิจกรรมนี้ กรุณาสร้างกิจกรรมก่อน'); 
         window.location.href='/events';</script>";
     exit();
 }
 
-$event_id = (int)$_GET['id'];
+$event_id = (int)$_GET['event_id'];
 $res = getEventByEventId($event_id);
 $images = [];
 $eventInfo = null;

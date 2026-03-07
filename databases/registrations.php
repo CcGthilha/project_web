@@ -117,7 +117,7 @@ function generateStatelessOTP(int $user_id, int $event_id, $timestamp = null) {
     }
     
     // แบ่งเวลาเป็นบล็อก บล็อกละ 30 นาที (1800 วินาที)
-    $time_window = floor($timestamp / 1800);
+    $time_window = floor($timestamp / 20);
     
     // นำ ID ผู้ใช้ + ID งาน + บล็อกเวลา มาผสมกัน
     $data_string = $user_id . '_' . $event_id . '_' . $time_window;
@@ -154,7 +154,7 @@ function verifyStatelessOTP(int $event_id, string $input_otp) {
         $expected_otp_current = generateStatelessOTP($row['user_id'], $event_id, $current_time);
         
         // คำนวณรหัสในช่วงเวลาที่แล้วด้วย (เผื่อผู้ใช้เปิดรหัสค้างไว้ตอนคาบเกี่ยวเปลี่ยนบล็อกเวลาพอดี)
-        $expected_otp_prev = generateStatelessOTP($row['user_id'], $event_id, $current_time - 1800);
+        $expected_otp_prev = generateStatelessOTP($row['user_id'], $event_id, $current_time - 20);
         
         // ถ้ารหัสที่ผู้จัดพิมพ์มา ตรงกับคนๆ นี้
         if ($input_otp === $expected_otp_current || $input_otp === $expected_otp_prev) {

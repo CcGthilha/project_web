@@ -1,6 +1,5 @@
 <?php
 // routes/verify-otp.php
-session_start();
 
 // ✅ แก้ไขเป็นรับค่าให้ครอบคลุมทั้ง GET และ POST แบบนี้ครับ:
 $event_id = 0;
@@ -34,10 +33,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['otp_code'])) {
     if ($attendee_name) {
         
         echo "<script>alert('รหัสถูกต้อง! ผู้เข้าร่วม: $attendee_name'); 
-            window.location.href='/events';</script>"; // แนะนำให้เด้งกลับไปหน้าหน้ารวมกิจกรรม
+            window.location.href='/event-detail?event_id=" . $event_id . "';</script>"; 
     } else {
         echo "<script>alert('รหัสไม่ถูกต้อง!'); 
-            window.location.href='/events';</script>"; // แนะนำให้เด้งกลับไปหน้าหน้ารวมกิจกรรม
+            window.location.href='/verify-otp?event_id=" . $event_id . "';</script>"; 
+            
     }
     exit();
 

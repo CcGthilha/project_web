@@ -12,9 +12,10 @@
     </div>
 
     <p style="color: #dc3545; font-size: 0.9em; margin-top: 15px;">
-        <small>⚠️ รหัสนี้มีอายุการใช้งาน 2 วิ ห้ามเปิดเผยแก่บุคคลอื่น</small>
+        <small>⚠️ รหัสนี้มีอายุการใช้งาน 30 นาที ห้ามเปิดเผยแก่บุคคลอื่น</small>
     </p>
 
 </main>
+
 
 <?php include 'footer.php'; ?>
