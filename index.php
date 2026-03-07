@@ -1,16 +1,17 @@
 <?php
 
 declare(strict_types=1);
-ini_set('display_errors', '1');
-ini_set('display_startup_errors', '1');
-error_reporting(E_ALL);
+// ini_set('display_errors', '1');
+// ini_set('display_startup_errors', '1');
+// error_reporting(E_ALL);
+
 session_start();
 
 // กำหนดค่าคงที่สำหรับไดเรกทอรีต่างๆ ในโปรเจค
-const INCLUDES_DIR = __DIR__ . '/../includes';
-const ROUTE_DIR = __DIR__ . '/../routes';
-const TEMPLATES_DIR = __DIR__ . '/../templates';
-const DATABASES_DIR = __DIR__ . '/../databases';
+const INCLUDES_DIR = __DIR__ . '/includes';
+const ROUTE_DIR = __DIR__ . '/routes';
+const TEMPLATES_DIR = __DIR__ . '/templates';
+const DATABASES_DIR = __DIR__ . '/databases';
 
 // รวมไฟล์ที่จำเป็น เข้ามาใช้งานใน index.php
 require_once INCLUDES_DIR . '/router.php';
