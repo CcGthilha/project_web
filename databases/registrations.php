@@ -1,18 +1,4 @@
 <?php
-// ฟังก์ชันสำหรับดึงรายชื่อคนเข้าร่วมกิจกรรม
-function getParticipantsByEventId(int $event_id): mysqli_result|bool
-{
-    global $conn;
-    $sql = "SELECT r.*, u.name, u.email 
-            FROM registrations r 
-            JOIN users u ON r.user_id = u.user_id 
-            WHERE r.event_id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param('i', $event_id);
-    $stmt->execute();
-    return $stmt->get_result();
-}
-
 // ฟังก์ชันสำหรับบันทึกการเข้าร่วม (สำหรับไฟล์ join-event.php)
 function joinEvent(int $user_id, int $event_id): bool
 {
@@ -162,4 +148,19 @@ function verifyStatelessOTP(int $event_id, string $input_otp) {
         }
     }
     return false; // ไม่ตรงกับใครเลย หรือรหัสหมดอายุ
+}
+
+
+function getParticipantsByEventId(int $event_id): mysqli_result|bool
+{
+    global $conn;
+    // เพิ่มการดึงข้อมูล gender, birth_date, occupation, province จากตาราง users
+    $sql = "SELECT r.*, u.name, u.email, u.gender, u.birth_date, u.occupation, u.province 
+            FROM registrations r 
+            JOIN users u ON r.user_id = u.user_id 
+            WHERE r.event_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param('i', $event_id);
+    $stmt->execute();
+    return $stmt->get_result();
 }

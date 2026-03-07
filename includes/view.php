@@ -7,3 +7,9 @@ function renderView(string $template, array $data = []): void
 {
     include TEMPLATES_DIR . '/' . $template . '.php';
 }
+
+function calculateAge($birthDate) {
+    $birthDate = new DateTime($birthDate);
+    $today = new DateTime('today');
+    return $birthDate->diff($today)->y;
+}

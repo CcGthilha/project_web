@@ -22,6 +22,12 @@
                                 style="background-color: #007bff; color: white; padding: 5px 10px; text-decoration: none; border-radius: 3px;">
                                 ดูรายชื่อผู้ขอเข้าร่วม
                             </a>
+                            <div class="actions" style="margin-top: 15px; display: flex; gap: 10px;">
+                                <a href="/event-stats?id=<?= $event['event_id'] ?>"
+                                    style="background-color: #17a2b8; color: white; padding: 5px 10px; text-decoration: none; border-radius: 3px;">
+                                    📊 ดูสถิติ
+                                </a>
+                            </div>
 
                             <a href="/edit-event?id=<?= $event['event_id'] ?>" style="color: blue;">แก้ไข</a>
                             <a href="/delete-event?id=<?= $event['event_id'] ?>" style="color: red;" onclick="return confirm('ลบกิจกรรมนี้?')">ลบ</a>
