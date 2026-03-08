@@ -45,7 +45,7 @@
 
                         <p>📅 <?= date('F j, Y - H:i', strtotime($row['start_date'])) ?> น.</p>
 
-                        <button onclick="window.location.href='event-detail?id=<?= $row['event_id'] ?>'"
+                        <button onclick="window.location.href='event-detail?event_id=<?= $row['event_id'] ?>'"
                             style="margin-top: auto; padding: 8px; cursor: pointer; background: #eee; border: 1px solid #ddd;">
                             ดูรายละเอียด
                         </button>

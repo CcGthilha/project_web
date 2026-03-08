@@ -44,7 +44,7 @@
                             </strong>
                         </p>
 
-                        <a href="/event-detail?id=<?= $row['event_id'] ?>">ดูรายละเอียดกิจกรรม</a>
+                        <a href="/event-detail?event_id=<?= $row['event_id'] ?>">ดูรายละเอียดกิจกรรม</a>
 
                     </div>
                 <?php
