@@ -1,2 +1,2 @@
 <?php
-renderView('main', ['title' => 'สวัสดีจ้า', 'result' => getEvent()]);
+renderView('main', ['title' => 'สวัสดีจ้า', 'upcoming' => getUpcomingEvents(), 'past' => getPastEvents()]);

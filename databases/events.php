@@ -1,17 +1,34 @@
 <?php
-function getEvent(): mysqli_result|bool
+function getUpcomingEvents(): mysqli_result|bool
 {
     global $conn;
-    $sql = 'select e.*, u.name, ei.image_path 
-            from events e 
-            join users u on e.user_id = u.user_id 
-            left join event_images ei on e.event_id = ei.event_id 
-            group by e.event_id 
-            order by e.event_id';
-    $stmt = $conn->prepare($sql);
-    $stmt->execute();
-    return $stmt->get_result();
+    $sql = "SELECT e.*, u.name, ei.image_path 
+            FROM events e
+            JOIN users u ON e.user_id = u.user_id
+            LEFT JOIN event_images ei ON e.event_id = ei.event_id
+            WHERE e.end_date >= NOW()
+            GROUP BY e.event_id
+            ORDER BY e.start_date ASC";
+
+    return $conn->query($sql);
 }
+
+
+function getPastEvents(): mysqli_result|bool
+{
+    global $conn;
+    $sql = "SELECT e.*, u.name, ei.image_path 
+            FROM events e
+            JOIN users u ON e.user_id = u.user_id
+            LEFT JOIN event_images ei ON e.event_id = ei.event_id
+            WHERE e.end_date < NOW()
+            GROUP BY e.event_id
+            ORDER BY e.end_date DESC";
+
+    return $conn->query($sql);
+}
+
+
 function getEventsByUserId(int $id): mysqli_result|bool
 {
     global $conn;
@@ -75,7 +92,7 @@ function deleteEvent(int $event_id): bool
     if ($row_img = $res_img->fetch_assoc()) {
         $file_path = '../public' . $row_img['image_path'];
         if (file_exists($file_path) && !empty($row_img['image_path'])) {
-            unlink($file_path); 
+            unlink($file_path);
         }
     }
     $sql_del_img = "delete from event_images WHERE event_id = ?";

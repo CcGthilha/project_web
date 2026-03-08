@@ -18,29 +18,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $end_date = $_POST['end_date'];
 
     $new_event_id = createEvent($user_id, $title, $description, $location, $start_date, $end_date);
-    
+
     if ($new_event_id) {
-        $upload_dir = '../public/uploads/';
+        $upload_dir = __DIR__ . '/../public/uploads/';
         if (!is_dir($upload_dir)) {
             mkdir($upload_dir, 0777, true);
         }
+
+        // COVER
         if (isset($_FILES['cover_image']) && $_FILES['cover_image']['error'] === UPLOAD_ERR_OK) {
             $file_name = time() . '_cover_' . basename($_FILES['cover_image']['name']);
             if (move_uploaded_file($_FILES['cover_image']['tmp_name'], $upload_dir . $file_name)) {
-                addEventImage($new_event_id, '/uploads/' . $file_name);
+                addEventImage($new_event_id, '/public/uploads/' . $file_name);
             }
         }
 
+        // GALLERY
         if (isset($_FILES['gallery_images']) && !empty($_FILES['gallery_images']['name'][0])) {
             foreach ($_FILES['gallery_images']['tmp_name'] as $key => $tmp_name) {
                 if ($_FILES['gallery_images']['error'][$key] === UPLOAD_ERR_OK) {
                     $file_name = time() . '_gallery_' . $key . '_' . basename($_FILES['gallery_images']['name'][$key]);
                     if (move_uploaded_file($tmp_name, $upload_dir . $file_name)) {
-                        addEventImage($new_event_id, '/uploads/' . $file_name);
+                        addEventImage($new_event_id, '/public/uploads/' . $file_name);
                     }
                 }
             }
         }
+
 
         header('Location: /events');
         exit();

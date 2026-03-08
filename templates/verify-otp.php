@@ -2,7 +2,7 @@
 <?php include 'header.php'; ?>
 
 <main style="padding: 40px 20px; text-align: center; font-family: sans-serif;">
-    
+
     <?php if (isset($data['title'])): ?>
         <h2 style="color: #333;"><?= htmlspecialchars($data['title']) ?></h2>
     <?php else: ?>
@@ -34,7 +34,7 @@
 
     <div style="margin-top: 20px;">
         <?php if (isset($data['event_id'])): ?>
-            <a href="/event-detail?id=<?= htmlspecialchars($data['event_id']) ?>" style="color: #6c757d; text-decoration: none;">&larr; กลับไปหน้ารายละเอียดกิจกรรม</a>
+            <a href="/event-detail?event_id=<?= htmlspecialchars($data['event_id']) ?>" style="color: #6c757d; text-decoration: none;">&larr; กลับไปหน้ารายละเอียดกิจกรรม</a>
         <?php else: ?>
             <a href="/events" style="color: #6c757d; text-decoration: none;">&larr; กลับไปหน้ากิจกรรมทั้งหมด</a>
         <?php endif; ?>
