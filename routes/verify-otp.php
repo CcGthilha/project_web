@@ -20,22 +20,37 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// ... โค้ดส่วนล่าง (ตรวจรหัส OTP) ปล่อยไว้เหมือนเดิม
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['otp_code'])) { 
-    // ไม่ใช่แค่การกดปุ่ม "ตรวจรหัสเข้างาน" มาจากหน้า event-detail
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['otp_code'])) { 
+    
     $event_id = (int)$_POST['event_id'];
     $otp_input = trim($_POST['otp_code']); 
 
-    // ตรวจสอบว่ารหัสนี้คือใคร
-    $attendee_name = verifyStatelessOTP($event_id, $otp_input);
+    // ตรวจสอบรหัส (จะได้ข้อมูลกลับมาเป็น Array)
+    $verify_data = verifyStatelessOTP($event_id, $otp_input);
 
-    if ($attendee_name) {
+    // แยกกรณีแจ้งเตือนตามผลลัพธ์
+    if ($verify_data['result'] === 'success') {
         
-        echo "<script>alert('รหัสถูกต้อง! ผู้เข้าร่วม: $attendee_name'); 
+        // รหัสถูกต้องและเพิ่งใช้ครั้งแรก -> อัปเดตสถานะเป็นเข้าร่วมแล้ว
+        markAsAttended($verify_data['registrations_id']);
+        $attendee_name = $verify_data['name'];
+        
+        echo "<script>alert('✅ รหัสถูกต้อง! เช็คชื่อให้คุณ: $attendee_name เรียบร้อยแล้ว'); 
             window.location.href='/event-detail?event_id=" . $event_id . "';</script>"; 
+            
+    } else if ($verify_data['result'] === 'already_used') {
+        
+        // รหัสถูกต้อง แต่ถูกใช้เช็คชื่อไปก่อนหน้านี้แล้ว
+        $attendee_name = $verify_data['name'];
+        
+        echo "<script>alert('⚠️ รหัสนี้ถูกใช้งานไปแล้ว! (คุณ $attendee_name ได้เช็คชื่อไปแล้ว)'); 
+            window.location.href='/verify-otp?event_id=" . $event_id . "';</script>"; 
+            
     } else {
-        echo "<script>alert('รหัสไม่ถูกต้อง!'); 
+        
+        // รหัสไม่ตรงกับใครเลย หรือพิมพ์ผิด
+        echo "<script>alert('❌ รหัสไม่ถูกต้อง หรือรหัสหมดอายุแล้ว!'); 
             window.location.href='/verify-otp?event_id=" . $event_id . "';</script>"; 
             
     }

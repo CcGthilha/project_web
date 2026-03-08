@@ -52,20 +52,18 @@
                 $reg_status = getRegistrationStatus($_SESSION['user_id'], $event['event_id']);
 
                 //เช็คสถานะแล้วแสดงข้อความให้ตรงความจริง
-                if ($reg_status === 'pending'):
-                ?>
+                if ($reg_status === 'pending'): ?>
                     <div style="display: flex; align-items: center; gap: 10px; margin-top: 15px;">
                         <p style="color: orange; font-weight: bold; margin: 0;">⏳ คำขอของคุณกำลังรอการอนุมัติ</p>
-
                         <form action="/cancel-join" method="post" style="margin: 0;">
                             <input type="hidden" name="event_id" value="<?= $event['event_id'] ?>">
                             <button type="submit" style="background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;" onclick="return confirm('แน่ใจหรือไม่ว่าต้องการยกเลิกคำขอเข้าร่วม?')">ยกเลิกคำขอ</button>
                         </form>
                     </div>
+
                 <?php elseif ($reg_status === 'approved'): ?>
                     <div style="display: flex; align-items: center; gap: 10px; margin-top: 15px;">
                         <p style="color: green; font-weight: bold; margin: 0;">✅ อนุมัติให้เข้าร่วมกิจกรรมแล้ว!</p>
-
                         <form action="/cancel-join" method="post" style="margin: 0;">
                             <input type="hidden" name="event_id" value="<?= $event['event_id'] ?>">
                             <button type="submit" style="background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;" onclick="return confirm('แน่ใจหรือไม่ว่าต้องการออกจากการเข้าร่วมกิจกรรมนี้?')">ออกจากการเข้าร่วม</button>
@@ -75,8 +73,16 @@
                             <button type="submit" style="background-color: #007bff; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">แสดงรหัสเข้างาน (OTP)</button>
                         </form>
                     </div>
+
+                <?php elseif ($reg_status === 'attended'): ?>
+                    <div style="margin-top: 15px; padding: 15px; background-color: #d4edda; border-radius: 5px; border: 1px solid #c3e6cb;">
+                        <p style="color: #155724; font-weight: bold; margin: 0;">
+                            🎉 คุณได้เข้าร่วมกิจกรรมนี้เรียบร้อยแล้ว!</p>
+                    </div>
+
                 <?php elseif ($reg_status === 'rejected'): ?>
                     <p style="color: red; font-weight: bold; margin-top: 15px;">❌ ขออภัย คำขอเข้าร่วมของคุณถูกปฏิเสธ</p>
+
                 <?php else: ?>
                     <form action="/join-event" method="post" style="margin-top: 15px;">
                         <input type="hidden" name="event_id" value="<?= $event['event_id'] ?>">

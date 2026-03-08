@@ -1,9 +1,7 @@
 <html>
 
-<head>
-</head>
-
 <body>
+    <!-- templates/main.php -->
     <?php include 'header.php' ?>
     <main style="padding: 20px;">
         <h1>กิจกรรม</h1>
@@ -57,6 +55,8 @@
                                     <span style="color: orange; font-weight: bold;">⏳ รอการอนุมัติ</span>
                                 <?php elseif ($reg_status === 'approved'): ?>
                                     <span style="color: green; font-weight: bold;">✅ อนุมัติแล้ว</span>
+                                <?php elseif ($reg_status === 'attended'): ?>
+                                    <span style="color: #28a745; font-weight: bold;">🎉 เข้าร่วมแล้ว</span>
                                 <?php elseif ($reg_status === 'rejected'): ?>
                                     <span style="color: red; font-weight: bold;">❌ ถูกปฏิเสธ</span>
                                 <?php else: ?>

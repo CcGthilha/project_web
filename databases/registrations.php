@@ -93,6 +93,7 @@ function updateRegistrationStatus(int $reg_id, string $status): bool
     return $stmt->execute();
 }
 
+// database/registrations.php
 // 1. ฟังก์ชันสร้างรหัส OTP แบบไม่พึ่งฐานข้อมูล (คำนวณตามเวลา 30 นาที)
 function generateStatelessOTP(int $user_id, int $event_id, $timestamp = null) {
     // กำหนด Secret Key ของเว็บเรา (ตั้งเป็นคำอะไรก็ได้)
@@ -103,7 +104,7 @@ function generateStatelessOTP(int $user_id, int $event_id, $timestamp = null) {
     }
     
     // แบ่งเวลาเป็นบล็อก บล็อกละ 30 นาที (1800 วินาที)
-    $time_window = floor($timestamp / 20);
+    $time_window = floor($timestamp / 1800);
     
     // นำ ID ผู้ใช้ + ID งาน + บล็อกเวลา มาผสมกัน
     $data_string = $user_id . '_' . $event_id . '_' . $time_window;
@@ -122,11 +123,11 @@ function generateStatelessOTP(int $user_id, int $event_id, $timestamp = null) {
 function verifyStatelessOTP(int $event_id, string $input_otp) {
     global $conn;
     
-    // 1. ดึงรายชื่อผู้ที่ "ผ่านการอนุมัติ" ในงานนี้ทั้งหมดมาเช็ค
-    $sql = "SELECT r.registrations_id, u.user_id, u.name 
+    // โค้ดใหม่: ดึง "ทุกคน" ที่อยู่ในงานนี้มาเช็ค (ตัด WHERE r.status = 'approved' ออก)
+    $sql = "SELECT r.registrations_id, r.status, u.user_id, u.name 
             FROM registrations r 
             JOIN users u ON r.user_id = u.user_id 
-            WHERE r.event_id = ? AND r.status = 'approved'";
+            WHERE r.event_id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('i', $event_id);
     $stmt->execute();
@@ -134,20 +135,44 @@ function verifyStatelessOTP(int $event_id, string $input_otp) {
     
     $current_time = time();
     
-    // 2. วนลูปเช็คว่ารหัสที่กรอกมา ตรงกับสมการของใครในเวลานี้
     while ($row = $result->fetch_assoc()) {
-        // คำนวณรหัสของคนๆ นี้ ในช่วงเวลาปัจจุบัน
         $expected_otp_current = generateStatelessOTP($row['user_id'], $event_id, $current_time);
+        $expected_otp_prev = generateStatelessOTP($row['user_id'], $event_id, $current_time - 1800);
         
-        // คำนวณรหัสในช่วงเวลาที่แล้วด้วย (เผื่อผู้ใช้เปิดรหัสค้างไว้ตอนคาบเกี่ยวเปลี่ยนบล็อกเวลาพอดี)
-        $expected_otp_prev = generateStatelessOTP($row['user_id'], $event_id, $current_time - 20);
-        
-        // ถ้ารหัสที่ผู้จัดพิมพ์มา ตรงกับคนๆ นี้
+        // ถ้ารหัสที่กรอกมา ตรงกับรหัสของคนๆ นี้
         if ($input_otp === $expected_otp_current || $input_otp === $expected_otp_prev) {
-            return $row['name']; // ส่งชื่อคนๆ นั้นกลับไป
+            
+            // เช็คสถานะว่าเป็นอะไร
+            if ($row['status'] === 'approved') {
+                return [
+                    'result' => 'success', // รหัสถูกและยังไม่เคยใช้
+                    'registrations_id' => $row['registrations_id'],
+                    'name' => $row['name']
+                ];
+            } else if ($row['status'] === 'attended') { 
+                // หมายเหตุ: ถ้าในฐานข้อมูลคุณใช้คำอื่นแทน attended (เช่น joined) ให้แก้ตรงนี้นะครับ
+                return [
+                    'result' => 'already_used', // รหัสถูก แต่ใช้ไปแล้ว
+                    'name' => $row['name']
+                ];
+            }
         }
     }
-    return false; // ไม่ตรงกับใครเลย หรือรหัสหมดอายุ
+    
+    // ถ้าวนลูปจนครบทุกคนแล้วรหัสยังไม่ตรงกับใครเลย
+    return [
+        'result' => 'invalid' // รหัสผิด หรือ หมดเวลา
+    ]; 
+}
+
+//ฟังก์ชันสำหรับเปลี่ยนสถานะว่า "เข้าร่วมงานแล้ว"
+function markAsAttended(int $registrations_id) {
+    global $conn;
+    // เปลี่ยนสถานะจาก approved เป็น attended (ถ้าฐานข้อมูลคุณใช้คำอื่น เช่น 'joined' ให้แก้ตรงนี้นะครับ)
+    $sql = "UPDATE registrations SET status = 'attended' WHERE registrations_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param('i', $registrations_id);
+    return $stmt->execute();
 }
 
 

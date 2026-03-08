@@ -1,6 +1,7 @@
 <html>
 
 <body>
+<!-- templates/view-participants.php -->
     <?php include 'header.php' ?>
     <main style="padding: 20px;">
         <h1><?= htmlspecialchars($data['title']) ?></h1>
@@ -26,14 +27,13 @@
                                     <td><?= date('d/m/Y H:i', strtotime($p['registered_at'])) ?></td>
                                     <td>
                                         <?php if ($p['status'] === 'pending'): ?>
-                                            <span style="color: orange; display: block; margin-bottom: 5px;">รอการตอบรับ</span>
-
-                                            <form action="/approve-participant" method="POST" style="display:inline;">
-                                            </form>
-                                        <?php else: ?>
-                                            <span style="color: <?= $p['status'] === 'approved' ? 'green' : 'red' ?>;">
-                                                <?= $p['status'] === 'approved' ? 'ยอมรับแล้ว' : 'ปฏิเสธแล้ว' ?>
-                                            </span>
+                                            <span style="color: orange; font-weight: bold;">รอการตอบรับ</span>
+                                        <?php elseif ($p['status'] === 'attended'): ?>
+                                            <span style="color: #198754; font-weight: bold;">✅ เข้าร่วมงานแล้ว</span>
+                                        <?php elseif ($p['status'] === 'approved'): ?>
+                                            <span style="color: green;">ยอมรับแล้ว</span>
+                                        <?php elseif ($p['status'] === 'rejected'): ?>
+                                            <span style="color: red;">ปฏิเสธแล้ว</span>
                                         <?php endif; ?>
                                     </td>
                                     <td>
