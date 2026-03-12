@@ -40,10 +40,10 @@
         </div>
 
         <div class="space-y-2">
-          <div class="flex justify-between items-center px-2">
+          <!-- <div class="flex justify-between items-center px-2">
             <label for="password" class="text-xs text-[#EEEEEE]/50 font-bold uppercase tracking-widest">รหัสผ่าน</label>
             <a href="#" class="text-[10px] text-[#00ADB5] hover:underline">ลืมรหัสผ่าน?</a>
-          </div>
+          </div> -->
           <div class="relative group">
             <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-[#EEEEEE]/20 group-focus-within:text-[#00ADB5] transition-colors"></i>
             <input type="password" name="password" id="password" required
