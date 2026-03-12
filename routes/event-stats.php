@@ -22,3 +22,4 @@ renderView('event-stats', [
     'event' => $event,
     'participants' => $participants
 ]);
+

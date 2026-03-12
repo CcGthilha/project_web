@@ -2,13 +2,20 @@
 function getUpcomingEvents(): mysqli_result|bool
 {
     global $conn;
+    // ดึงกิจกรรมที่ยังไม่ถึงเวลาสิ้นสุด (ยังไม่จบ)
+    // และเรียงให้กิจกรรมที่เริ่มแล้ว (Live) ขึ้นก่อน ตามด้วยกิจกรรมที่กำลังจะถึง
     $sql = "SELECT e.*, u.name, ei.image_path 
             FROM events e
             JOIN users u ON e.user_id = u.user_id
             LEFT JOIN event_images ei ON e.event_id = ei.event_id
-            WHERE e.end_date >= NOW()
+            WHERE e.end_date >= NOW() 
             GROUP BY e.event_id
-            ORDER BY e.start_date ASC";
+            ORDER BY 
+                CASE 
+                    WHEN e.start_date <= NOW() THEN 1 -- กิจกรรมที่เริ่มแล้วให้ความสำคัญอันดับ 1
+                    ELSE 2                           -- กิจกรรมที่ยังไม่เริ่มให้ความสำคัญอันดับ 2
+                END, 
+                e.start_date ASC";
 
     return $conn->query($sql);
 }

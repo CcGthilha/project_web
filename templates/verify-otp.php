@@ -1,45 +1,74 @@
-<!-- templates/verify-otp.php -->
-<?php include 'header.php'; ?>
+<!DOCTYPE html>
+<html lang="th">
 
-<main style="padding: 40px 20px; text-align: center; font-family: sans-serif;">
+<head>
+    <title>ตรวจสอบรหัสเข้างาน | Event for you</title>
+</head>
 
-    <?php if (isset($data['title'])): ?>
-        <h2 style="color: #333;"><?= htmlspecialchars($data['title']) ?></h2>
-    <?php else: ?>
-        <h2 style="color: #333;">ตรวจสอบและยืนยันการเข้างาน</h2> <?php endif; ?>
+<body class="bg-[#222831]">
+    <?php include 'header.php'; ?>
 
-    <p style="color: #666; margin-bottom: 20px;">สำหรับผู้จัด: กรุณากรอกรหัส OTP 6 หลัก จากมือถือของผู้เข้าร่วมกิจกรรม</p>
+    <main class="min-h-[80vh] flex items-center justify-center px-4 py-12">
+        <div class="max-w-md w-full bg-[#393E46] rounded-[3rem] p-8 md:p-12 shadow-2xl border border-[#EEEEEE]/5 text-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-32 h-32 bg-[#00ADB5]/5 rounded-full -ml-16 -mt-16 blur-3xl"></div>
 
-    <form action="/verify-otp" method="POST" style="max-width: 400px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 1px solid #ddd;">
+            <div class="relative z-10">
+                <div class="w-20 h-20 bg-[#222831] rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-inner border border-[#00ADB5]/20">
+                    <i class="fas fa-user-check text-[#00ADB5] text-3xl"></i>
+                </div>
 
-        <?php if (isset($data['event_id'])): ?>
-            <input type="hidden" name="event_id" value="<?= htmlspecialchars($data['event_id']) ?>">
-        <?php else: ?>
-            <p style="color: red;">ไม่พบข้อมูลกิจกรรม โปรดกลับไปที่หน้ากิจกรรมก่อนครับ</p>
-        <?php endif; ?>
+                <?php if (isset($data['title'])): ?>
+                    <h2 class="text-2xl font-bold text-[#EEEEEE] tracking-tight mb-2"><?= htmlspecialchars($data['title']) ?></h2>
+                <?php else: ?>
+                    <h2 class="text-2xl font-bold text-[#EEEEEE] tracking-tight mb-2">ตรวจสอบและยืนยันการเข้างาน</h2>
+                <?php endif; ?>
 
-        <div style="margin-bottom: 25px;">
-            <label for="otp_code" style="display: block; font-weight: bold; margin-bottom: 10px; color: #444; font-size: 1.1em;">รหัสเข้างาน (6 หลัก)</label>
+                <p class="text-[#EEEEEE]/40 text-sm mb-10 font-light">
+                    สำหรับผู้จัด: กรุณากรอกรหัส OTP 6 หลัก <br>จากมือถือของผู้เข้าร่วมกิจกรรมเพื่อยืนยัน
+                </p>
 
-            <input type="text" id="otp_code" name="otp_code" maxlength="6" pattern="\d{6}" required
-                style="width: 100%; box-sizing: border-box; padding: 15px; font-size: 32px; text-align: center; letter-spacing: 8px; border: 2px solid #007bff; border-radius: 8px; outline: none;"
-                placeholder="------" autocomplete="off" autofocus>
+                <form action="/verify-otp" method="POST" class="space-y-8">
+                    <?php if (isset($data['event_id'])): ?>
+                        <input type="hidden" name="event_id" value="<?= htmlspecialchars($data['event_id']) ?>">
+                    <?php else: ?>
+                        <div class="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-2xl text-xs mb-6">
+                            <i class="fas fa-exclamation-circle mr-1"></i> ไม่พบข้อมูลกิจกรรม โปรดกลับไปที่หน้ากิจกรรมก่อนครับ
+                        </div>
+                    <?php endif; ?>
+
+                    <div class="space-y-4">
+                        <label for="otp_code" class="text-xs text-[#00ADB5] uppercase font-bold tracking-[0.2em]">รหัสเข้างาน (6 หลัก)</label>
+                        <div class="relative">
+                            <input type="text" id="otp_code" name="otp_code" maxlength="6" pattern="\d{6}" required
+                                class="w-full bg-[#222831] border-2 border-[#393E46] rounded-[2rem] py-6 px-4 text-4xl md:text-5xl text-center font-black tracking-[10px] text-[#00ADB5] focus:outline-none focus:border-[#00ADB5] focus:ring-4 focus:ring-[#00ADB5]/10 transition-all placeholder:text-[#393E46] selection:bg-[#00ADB5] selection:text-[#222831]"
+                                placeholder="000000" autocomplete="off" autofocus>
+                        </div>
+                    </div>
+
+                    <button type="submit"
+                        class="w-full py-5 bg-[#00ADB5] text-[#222831] rounded-[2rem] font-bold text-xl hover:shadow-[0_15px_30px_rgba(0,173,181,0.3)] hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3">
+                        <i class="fas fa-shield-check"></i> ตรวจสอบข้อมูล
+                    </button>
+                </form>
+
+                <div class="mt-10">
+                    <?php if (isset($data['event_id'])): ?>
+                        <a href="/event-detail?event_id=<?= htmlspecialchars($data['event_id']) ?>"
+                            class="text-[#EEEEEE]/30 text-xs hover:text-[#00ADB5] transition-all flex items-center justify-center gap-2">
+                            <i class="fas fa-arrow-left text-[10px]"></i> กลับไปหน้ารายละเอียดกิจกรรม
+                        </a>
+                    <?php else: ?>
+                        <a href="/events"
+                            class="text-[#EEEEEE]/30 text-xs hover:text-[#00ADB5] transition-all flex items-center justify-center gap-2">
+                            <i class="fas fa-arrow-left text-[10px]"></i> กลับไปหน้ากิจกรรมทั้งหมด
+                        </a>
+                    <?php endif; ?>
+                </div>
+            </div>
         </div>
+    </main>
 
-        <button type="submit" style="width: 100%; padding: 15px; background-color: #28a745; color: white; border: none; border-radius: 8px; font-size: 1.2em; font-weight: bold; cursor: pointer;">
-            🔍 ตรวจสอบและยืนยันการเข้างาน
-        </button>
+    <?php include 'footer.php'; ?>
+</body>
 
-    </form>
-
-    <div style="margin-top: 20px;">
-        <?php if (isset($data['event_id'])): ?>
-            <a href="/event-detail?event_id=<?= htmlspecialchars($data['event_id']) ?>" style="color: #6c757d; text-decoration: none;">&larr; กลับไปหน้ารายละเอียดกิจกรรม</a>
-        <?php else: ?>
-            <a href="/events" style="color: #6c757d; text-decoration: none;">&larr; กลับไปหน้ากิจกรรมทั้งหมด</a>
-        <?php endif; ?>
-    </div>
-
-</main>
-
-<?php include 'footer.php'; ?>
+</html>

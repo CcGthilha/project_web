@@ -4,16 +4,13 @@ $keyword = $_GET['keyword'] ?? '';
 $start_date = $_GET['start_date'] ?? '';
 $end_date = $_GET['end_date'] ?? '';
 
-
 if ($start_date != '' && $end_date != '') {
-    // กรณีค้นหาตามช่วงวัน
     $result = getEventByDateRange($start_date, $end_date);
 } elseif ($keyword != '') {
-    // กรณีค้นหาตาม Keyword
     $result = getEventByKeyword($keyword);
 } else {
-    // ดึงข้อมูลทั้งหมด
-    $result = getEvent();
+    $result = getUpcomingEvents();
 }
 
-renderView('main', ['title' => 'ผลการค้นหา', 'result' => $result]);
+// แก้ไขจุดนี้: เปลี่ยนจาก 'result' เป็น 'upcoming'
+renderView('main', ['title' => 'ผลการค้นหา', 'upcoming' => $result]);

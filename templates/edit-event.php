@@ -1,70 +1,129 @@
 <!DOCTYPE html>
-<html>
+<html lang="th">
 
-<body>
-    <header>
-        <?php include 'header.php' ?>
-    </header>
+<head>
+    <title>แก้ไขกิจกรรม | Event for you</title>
+</head>
 
-    <main style="padding: 20px;">
-        <h1><?= $data['title'] ?></h1>
+<body class="bg-[#222831]">
+    <?php include 'header.php' ?>
 
-        <?php
-        
-        if (isset($data['event'])):
-            // เอาข้อมูลมาใส่ตัวแปร $row เพื่อให้เรียกใช้โค้ดเดิมด้านล่างได้เลย
-            $row = $data['event'];
-        ?>
-            <?php $row = $data['event']; ?>
-            <form action="/edit-event" method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; max-width: 500px; gap: 10px;">
+    <main class="max-w-4xl mx-auto px-4 py-12">
+        <div class="mb-10 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-[#00ADB5] rounded-2xl flex items-center justify-center shadow-lg shadow-[#00ADB5]/20">
+                    <i class="fas fa-edit text-[#222831] text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-3xl font-bold text-[#EEEEEE]">แก้ไขกิจกรรม</h2>
+                    <p class="text-[#EEEEEE]/50 text-sm font-light">ปรับปรุงข้อมูลกิจกรรมของคุณให้เป็นปัจจุบัน</p>
+                </div>
+            </div>
+            <a href="/events" class="hidden md:block text-[#EEEEEE]/40 hover:text-[#00ADB5] transition text-sm">
+                <i class="fas fa-arrow-left mr-2"></i> ยกเลิกและกลับหน้าเดิม
+            </a>
+        </div>
+
+        <?php if (isset($data['event'])): $row = $data['event']; ?>
+            <form action="/edit-event" method="POST" enctype="multipart/form-data" class="space-y-8">
                 <input type="hidden" name="event_id" value="<?= $row['event_id'] ?>">
 
-                <label>รูปภาพปัจจุบัน:</label>
-                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
-                    <?php if (!empty($data['images'])): ?>
-                        <?php foreach ($data['images'] as $img_id => $img_path): ?>
-                            <div style="text-align: center;">
-                                <img src="<?= $img_path ?>" style="width: 100px; height: 100px; object-fit: cover; border-radius: 5px;">
-                                <br>
-                                <input type="checkbox" name="delete_images[]" value="<?= $img_id ?>"> ลบ
-                            </div>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
+                <div class="bg-[#393E46] p-8 rounded-[2.5rem] border border-[#EEEEEE]/5 shadow-xl">
+                    <h3 class="text-[#00ADB5] font-bold mb-6 flex items-center gap-2">
+                        <i class="fas fa-images"></i> จัดการรูปภาพ
+                    </h3>
+
+                    <label class="text-xs text-[#EEEEEE]/40 uppercase font-bold tracking-widest block mb-4">รูปภาพปัจจุบัน (เลือกเพื่อลบ)</label>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+                        <?php if (!empty($data['images'])): ?>
+                            <?php foreach ($data['images'] as $img_id => $img_path): ?>
+                                <label class="relative group cursor-pointer">
+                                    <img src="<?= $img_path ?>" class="w-full aspect-square object-cover rounded-2xl border-2 border-transparent group-hover:border-red-500 transition-all">
+                                    <div class="absolute inset-0 bg-red-500/0 group-hover:bg-red-500/20 rounded-2xl transition-all flex items-center justify-center">
+                                        <input type="checkbox" name="delete_images[]" value="<?= $img_id ?>" class="w-5 h-5 accent-red-500">
+                                    </div>
+                                    <span class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">ลบ</span>
+                                </label>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <p class="text-[#EEEEEE]/20 text-sm italic col-span-full">ยังไม่มีรูปภาพประกอบ</p>
+                        <?php endif; ?>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="new_images" class="text-xs text-[#EEEEEE]/40 uppercase font-bold tracking-widest block">เพิ่มรูปภาพเพิ่มเติม</label>
+                        <input type="file" id="new_images" name="new_images[]" accept="image/*" multiple
+                            class="w-full bg-[#222831] border border-[#393E46] rounded-xl py-3 px-4 text-[#EEEEEE] text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#00ADB5]/10 file:text-[#00ADB5] hover:file:bg-[#00ADB5]/20 cursor-pointer">
+                    </div>
                 </div>
 
-                <label for="new_images">เพิ่มรูปภาพเพิ่มเติม:</label>
-                <input type="file" name="new_images[]" accept="image/*" multiple>
+                <div class="bg-[#393E46] p-8 rounded-[2.5rem] border border-[#EEEEEE]/5 shadow-xl space-y-6">
+                    <h3 class="text-[#00ADB5] font-bold mb-2 flex items-center gap-2">
+                        <i class="fas fa-info-circle"></i> ข้อมูลรายละเอียด
+                    </h3>
 
-                <label for="title">ชื่อกิจกรรม:</label>
-                <input type="text" id="title" name="title" value="<?= htmlspecialchars($row['title']) ?>" required>
+                    <div class="space-y-2">
+                        <label for="title" class="text-xs text-[#EEEEEE]/50 ml-2">ชื่อกิจกรรม</label>
+                        <input type="text" id="title" name="title" value="<?= htmlspecialchars($row['title']) ?>" required
+                            class="w-full bg-[#222831] border border-[#393E46] rounded-xl py-3.5 px-4 text-[#EEEEEE] focus:outline-none focus:border-[#00ADB5] transition-all"
+                            placeholder="ระบุชื่อกิจกรรมของคุณ">
+                    </div>
 
-                <label for="description">รายละเอียด:</label>
-                <textarea id="description" name="description" rows="4" required><?= htmlspecialchars($row['description']) ?></textarea>
+                    <div class="space-y-2">
+                        <label for="description" class="text-xs text-[#EEEEEE]/50 ml-2">รายละเอียดกิจกรรม</label>
+                        <textarea id="description" name="description" rows="5" required
+                            class="w-full bg-[#222831] border border-[#393E46] rounded-xl py-3.5 px-4 text-[#EEEEEE] focus:outline-none focus:border-[#00ADB5] transition-all resize-none"
+                            placeholder="บรรยายเกี่ยวกับกิจกรรมนี้..."><?= htmlspecialchars($row['description']) ?></textarea>
+                    </div>
 
-                <label for="location">สถานที่:</label>
-                <input type="text" id="location" name="location" value="<?= htmlspecialchars($row['location']) ?>" required>
+                    <div class="space-y-2">
+                        <label for="location" class="text-xs text-[#EEEEEE]/50 ml-2">สถานที่จัดงาน</label>
+                        <div class="relative">
+                            <i class="fas fa-map-marker-alt absolute left-4 top-1/2 -translate-y-1/2 text-[#00ADB5]"></i>
+                            <input type="text" id="location" name="location" value="<?= htmlspecialchars($row['location']) ?>" required
+                                class="w-full bg-[#222831] border border-[#393E46] rounded-xl py-3.5 pl-12 pr-4 text-[#EEEEEE] focus:outline-none focus:border-[#00ADB5] transition-all"
+                                placeholder="เช่น ห้องประชุม A, สวนสาธารณะ...">
+                        </div>
+                    </div>
 
-                <label for="start_date">เริ่มวันที่:</label>
-                <input type="datetime-local" id="start_date" name="start_date"
-                    value="<?= date('Y-m-d\TH:i', strtotime($row['start_date'])) ?>" required>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+                        <div class="space-y-2">
+                            <label for="start_date" class="text-xs text-[#EEEEEE]/50 ml-2">วันที่เริ่มกิจกรรม</label>
+                            <input type="datetime-local" id="start_date" name="start_date"
+                                value="<?= date('Y-m-d\TH:i', strtotime($row['start_date'])) ?>" required
+                                class="w-full bg-[#222831] border border-[#393E46] rounded-xl py-3.5 px-4 text-[#EEEEEE] focus:outline-none focus:border-[#00ADB5] transition-all [color-scheme:dark]">
+                        </div>
+                        <div class="space-y-2">
+                            <label for="end_date" class="text-xs text-[#EEEEEE]/50 ml-2">วันที่สิ้นสุดกิจกรรม</label>
+                            <input type="datetime-local" id="end_date" name="end_date"
+                                value="<?= date('Y-m-d\TH:i', strtotime($row['end_date'])) ?>" required
+                                class="w-full bg-[#222831] border border-[#393E46] rounded-xl py-3.5 px-4 text-[#EEEEEE] focus:outline-none focus:border-[#00ADB5] transition-all [color-scheme:dark]">
+                        </div>
+                    </div>
+                </div>
 
-                <label for="end_date">สิ้นสุดวันที่:</label>
-                <input type="datetime-local" id="end_date" name="end_date"
-                    value="<?= date('Y-m-d\TH:i', strtotime($row['end_date'])) ?>" required>
-
-                <button type="submit" style="margin-top: 15px; padding: 10px; background-color: #28a745; color: white; border: none; cursor: pointer;">
-                    บันทึกการแก้ไข
-                </button>
+                <div class="pt-6">
+                    <button type="submit"
+                        class="w-full py-5 bg-[#00ADB5] text-[#222831] rounded-[2rem] font-bold text-xl hover:shadow-[0_15px_35px_rgba(0,173,181,0.3)] hover:scale-[1.01] active:scale-95 transition-all flex items-center justify-center gap-3">
+                        <i class="fas fa-save"></i> บันทึกข้อมูลที่แก้ไข
+                    </button>
+                    <p class="text-center mt-6">
+                        <a href="/events" class="text-[#EEEEEE]/30 text-sm hover:text-red-400 transition">ยกเลิกการแก้ไข</a>
+                    </p>
+                </div>
             </form>
         <?php else: ?>
-            <p style="color: red;">ไม่พบข้อมูลกิจกรรมที่ต้องการแก้ไข หรือคุณไม่มีสิทธิ์เข้าถึง</p>
+            <div class="bg-[#393E46] rounded-[2.5rem] p-20 text-center border border-red-500/20">
+                <i class="fas fa-exclamation-triangle text-red-500 text-5xl mb-6"></i>
+                <h3 class="text-xl font-bold text-[#EEEEEE]">ไม่พบข้อมูลกิจกรรม</h3>
+                <p class="text-[#EEEEEE]/40 mt-2">คุณอาจไม่มีสิทธิ์เข้าถึงหน้านี้ หรือกิจกรรมถูกลบไปแล้ว</p>
+                <a href="/events" class="inline-block mt-8 text-[#00ADB5] font-bold hover:underline">กลับไปหน้ากิจกรรมของคุณ</a>
+            </div>
         <?php endif; ?>
 
     </main>
 
-    <footer>
-        <?php include 'footer.php' ?>
-    </footer>
+    <?php include 'footer.php' ?>
 </body>
 
 </html>
