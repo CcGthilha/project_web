@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="th">
+<!-- /templates/event-detail.php -->
 
 <head>
     <title><?= htmlspecialchars($data['title']) ?> | Event for you</title>
+
 </head>
 
 <body class="bg-[#222831]">
@@ -10,10 +12,33 @@
 
     <?php
     $event = $data['event'] ?? null;
+    $clean_desc = '';
+    $max_limit = 0;
+    $current_joined = 0;
+    $is_full = false;  //ตัวแปรเช็คคนเต็ม
+
     if ($event) {
         $now = new DateTime();
         $endDate = new DateTime($event['end_date']);
         $isPast = ($endDate < $now); // เช็คว่ากิจกรรมจบหรือยัง
+
+        $raw_desc = $event['description'];
+        $clean_desc = $raw_desc;
+
+        // 🌟 ค้นหาแท็ก [MAX:ตัวเลข] 🌟
+        if (preg_match('/\[MAX:(\d+)\]/i', $raw_desc, $matches)) {
+            $max_limit = (int)$matches[1];
+            // ลบแท็ก [MAX:...] ออก เพื่อให้เหลือแค่ข้อความล้วนๆ สำหรับแสดงผล
+            $clean_desc = str_replace($matches[0], '', $raw_desc);
+        }
+
+        // 🌟 ดึงจำนวนคนที่เข้าร่วมแล้ว
+        $current_joined = getParticipantCount($event['event_id']);
+
+        // 🌟 เช็คว่าจำนวนคนปัจจุบัน มากกว่าหรือเท่ากับที่รับสมัครหรือไม่ (และต้องไม่ใช่ 0 คือไม่จำกัด)
+        if ($max_limit > 0 && $current_joined >= $max_limit) {
+            $is_full = true;
+        }
     }
     ?>
 
@@ -46,7 +71,7 @@
                     <div class="bg-[#393E46]/30 p-8 rounded-[2.5rem] border border-[#EEEEEE]/5 shadow-sm">
                         <h3 class="text-[#00ADB5] font-bold text-sm uppercase tracking-[0.2em] mb-4">รายละเอียดกิจกรรม</h3>
                         <div class="text-[#EEEEEE]/80 leading-relaxed text-lg font-light">
-                            <?= nl2br(htmlspecialchars($event['description'])) ?>
+                            <?= nl2br(htmlspecialchars(trim($clean_desc))) ?>
                         </div>
                     </div>
                 </div>
@@ -54,6 +79,12 @@
                 <div class="space-y-6">
                     <div class="bg-[#393E46] p-8 rounded-[2.5rem] border border-[#00ADB5]/20 shadow-2xl sticky top-28">
                         <div class="space-y-6 mb-10">
+                            <span class="text-[#EEEEEE]/50 text-xl font-normal normal-case flex items-center gap-2">
+                                เข้าร่วมแล้ว:
+                                <span class="<?= $is_full ? 'text-red-400' : 'text-[#00ADB5]' ?> font-bold text-lg">
+                                    <?= $current_joined ?> / <?= $max_limit == 0 ? 'ไม่จำกัด' : $max_limit ?>
+                                </span>
+                            </span>
                             <div class="flex items-start gap-4">
                                 <div class="w-10 h-10 bg-[#00ADB5]/10 rounded-xl flex items-center justify-center text-[#00ADB5] shrink-0">
                                     <i class="fas fa-map-marker-alt"></i>
@@ -156,12 +187,18 @@
 
                                 <?php else: ?>
                                     <?php if (!$isPast): ?>
-                                        <form action="/join-event" method="post">
-                                            <input type="hidden" name="event_id" value="<?= $event['event_id'] ?>">
-                                            <button type="submit" class="w-full py-5 bg-[#00ADB5] text-[#222831] rounded-[2rem] font-bold text-xl hover:scale-[1.02] transition-all shadow-xl shadow-[#00ADB5]/20">
-                                                เข้าร่วมกิจกรรม
-                                            </button>
-                                        </form>
+                                        <?php if ($is_full): ?>
+                                            <div class="w-full py-5 bg-red-500/10 text-red-400 text-center rounded-[2rem] font-bold text-lg border border-red-500/20 cursor-not-allowed">
+                                                <i class="fas fa-users-slash"></i> ผู้เข้าร่วมเต็มจำนวนแล้ว
+                                            </div>
+                                        <?php else: ?>
+                                            <form action="/join-event" method="post">
+                                                <input type="hidden" name="event_id" value="<?= $event['event_id'] ?>">
+                                                <button type="submit" class="w-full py-5 bg-[#00ADB5] text-[#222831] rounded-[2rem] font-bold text-xl hover:scale-[1.02] transition-all shadow-xl shadow-[#00ADB5]/20">
+                                                    เข้าร่วมกิจกรรม
+                                                </button>
+                                            </form>
+                                        <?php endif; ?>
                                     <?php else: ?>
                                         <div class="w-full py-5 bg-[#222831]/50 text-[#EEEEEE]/20 text-center rounded-[2rem] font-bold text-lg border border-[#EEEEEE]/5 cursor-not-allowed">
                                             กิจกรรมจบลงแล้ว

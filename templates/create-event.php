@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="th">
+<!-- /templates/create-event.php -->
 
 <head>
     <title>สร้างกิจกรรมใหม่ | Event for you</title>
+
 </head>
 
 <body class="bg-[#222831]">
@@ -61,6 +63,14 @@
                         <div class="relative">
                             <i class="fas fa-map-marker-alt absolute left-5 top-1/2 -translate-y-1/2 text-[#00ADB5]"></i>
                             <input type="text" id="location" name="location" placeholder="เช่น อาคาร A ห้อง 101 หรือ ออนไลน์" required
+                                class="w-full bg-[#222831] border border-[#393E46] rounded-xl py-4 pl-12 pr-5 text-[#EEEEEE] focus:outline-none focus:border-[#00ADB5] transition">
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label for="max_participants" class="text-xs text-[#EEEEEE]/50 ml-2">จำนวนผู้เข้าร่วมสูงสุด (ระบุ 0 หากไม่จำกัด)*</label>
+                        <div class="relative">
+                            <i class="fas fa-users absolute left-5 top-1/2 -translate-y-1/2 text-[#00ADB5]"></i>
+                            <input type="number" id="max_participants" name="max_participants" min="0" max="99999" value="0" required
                                 class="w-full bg-[#222831] border border-[#393E46] rounded-xl py-4 pl-12 pr-5 text-[#EEEEEE] focus:outline-none focus:border-[#00ADB5] transition">
                         </div>
                     </div>

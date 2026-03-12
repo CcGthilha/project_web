@@ -189,3 +189,17 @@ function getParticipantsByEventId(int $event_id): mysqli_result|bool
     $stmt->execute();
     return $stmt->get_result();
 }
+
+function getParticipantCount($event_id) {
+    global $conn; // ใช้ตัวแปรเชื่อมต่อฐานข้อมูลของคุณ
+    
+    // นับเฉพาะคนที่สถานะเป็น approved (อนุมัติแล้ว) หรือ attended (เข้าร่วมแล้ว)
+    $sql = "SELECT COUNT(*) as total FROM registrations WHERE event_id = ? AND status IN ('approved', 'attended')";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $event_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    
+    return $row['total'] ?? 0;
+}

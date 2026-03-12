@@ -1,4 +1,5 @@
 <?php
+// /routes/create-event.php
 if (!isset($_SESSION['user_id'])) {
     echo "<script>alert('กรุณาล็อกอินก่อนสร้างกิจกรรม'); 
         window.location.href='/login';</script>";
@@ -12,12 +13,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_id = $_SESSION['user_id'];
     $title = $_POST['title'];
-    $description = $_POST['description'];
+    $raw_description = $_POST['description'];
     $location = $_POST['location'];
     $start_date = $_POST['start_date'];
-    $end_date = $_POST['end_date'];
+    $end_date = $_POST['end_date']; 
+    
+    $max_participants = isset($_POST['max_participants']) ? (int)$_POST['max_participants'] : 0;
 
-    $new_event_id = createEvent($user_id, $title, $description, $location, $start_date, $end_date);
+    if ($max_participants > 99999) {
+        $max_participants = 99999;
+    }
+
+    $final_description = $raw_description . " [MAX:" . $max_participants . "]";
+
+    $new_event_id = createEvent($user_id, $title, $final_description, $location, $start_date, $end_date);
 
     if ($new_event_id) {
         $upload_dir = __DIR__ . '/../public/uploads/';
@@ -46,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         }
 
 
-        header('Location: /events');
+        header('Location: /main');
         exit();
     } else {
         echo "<script>alert('เกิดข้อผิดพลาดในการสร้างกิจกรรม'); window.history.back();</script>";

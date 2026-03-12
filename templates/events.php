@@ -30,6 +30,22 @@
           $now = new DateTime();
           $endDate = new DateTime($event['end_date']);
           $isPast = ($endDate < $now);
+
+          // 🌟 โค้ดใหม่: นับคนรออนุมัติ (pending) เฉพาะของกิจกรรมนี้ 🌟
+          global $conn;
+          $pending_count = 0;
+          if ($conn) {
+              $sql_pending = "SELECT COUNT(*) as wait_count FROM registrations WHERE event_id = ? AND status = 'pending'";
+              $stmt_pending = $conn->prepare($sql_pending);
+              if ($stmt_pending) {
+                  $stmt_pending->bind_param("i", $event['event_id']);
+                  $stmt_pending->execute();
+                  $res_pending = $stmt_pending->get_result()->fetch_assoc();
+                  if ($res_pending) {
+                      $pending_count = $res_pending['wait_count'];
+                  }
+              }
+          }
         ?>
           <div class="group bg-[#393E46] rounded-[2.5rem] overflow-hidden border border-[#EEEEEE]/5 hover:border-[#00ADB5]/30 transition-all duration-500 shadow-xl flex flex-col <?= $isPast ? 'opacity-75' : '' ?>">
             <div class="relative h-52 overflow-hidden">
@@ -75,9 +91,16 @@
               <div class="flex flex-col gap-3">
                 <div class="grid grid-cols-2 gap-3">
                   <a href="/view-participants?id=<?= $event['event_id'] ?>"
-                    class="py-3 bg-[#222831] text-[#EEEEEE] text-center rounded-2xl font-bold text-xs border border-[#EEEEEE]/5 hover:border-[#00ADB5]/50 transition-all flex items-center justify-center gap-2">
+                    class="relative py-3 bg-[#222831] text-[#EEEEEE] text-center rounded-2xl font-bold text-xs border border-[#EEEEEE]/5 hover:border-[#00ADB5]/50 transition-all flex items-center justify-center gap-2">
                     <i class="fas fa-users-cog"></i> ผู้สมัคร
+                    
+                    <?php if ($pending_count > 0): ?>
+                        <span class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full animate-pulse shadow-lg shadow-red-500/50">
+                            <?= $pending_count > 99 ? '99+' : $pending_count ?>
+                        </span>
+                    <?php endif; ?>
                   </a>
+
                   <a href="/event-stats?id=<?= $event['event_id'] ?>"
                     class="py-3 bg-[#222831] text-[#EEEEEE]/60 text-center rounded-2xl font-bold text-xs border border-[#EEEEEE]/5 hover:text-[#00ADB5] transition-all flex items-center justify-center gap-2">
                     <i class="fas fa-chart-line"></i> สถิติ

@@ -27,6 +27,30 @@
     </style>
 </head>
 
+<?php
+// 🌟 โค้ดใหม่: คำนวณหาจำนวนคนที่ "รอการอนุมัติ" ในกิจกรรมของเรา 🌟
+$notify_count = 0;
+if (isset($_SESSION['user_id'])) {
+    global $conn;
+    $user_id_now = $_SESSION['user_id'];
+
+    // ดึงจำนวนคนที่ status = 'pending' ในกิจกรรมที่ user คนนี้เป็นคนสร้าง
+    $sql_notify = "SELECT COUNT(r.registrations_id) as total_pending 
+                   FROM registrations r 
+                   JOIN events e ON r.event_id = e.event_id 
+                   WHERE e.user_id = ? AND r.status = 'pending'";
+
+    $stmt_notify = $conn->prepare($sql_notify);
+    $stmt_notify->bind_param("i", $user_id_now);
+    $stmt_notify->execute();
+    $res_notify = $stmt_notify->get_result()->fetch_assoc();
+
+    if ($res_notify) {
+        $notify_count = $res_notify['total_pending'];
+    }
+}
+?>
+
 <header class="sticky top-0 z-50 glass-nav">
     <nav class="max-w-7xl mx-auto px-5 py-4">
         <div class="flex justify-between items-center">
@@ -45,8 +69,15 @@
 
                 <?php if (isset($_SESSION['user_id'])): ?>
                     <a href="/list-join-events" class="text-[#EEEEEE] hover:text-[#00ADB5] transition">ที่เข้าร่วม</a>
-                    <a href="/events" class="text-[#EEEEEE] hover:text-[#00ADB5] transition">กิจกรรมของคุณ</a>
-                    <div class="h-6 w-px bg-[#393E46]"></div>
+                    <a href="/events" class="flex items-center gap-1.5 text-[#EEEEEE] hover:text-[#00ADB5] transition">
+                        กิจกรรมของคุณ
+                        <?php if ($notify_count > 0): ?>
+                            <span class="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full animate-pulse shadow-lg shadow-red-500/30">
+                                <?= $notify_count > 99 ? '99+' : $notify_count ?>
+                            </span>
+                        <?php endif; ?>
+                    </a>
+
                     <a href="/personal" class="flex items-center gap-2 hover:text-[#00ADB5] transition">
                         <div class="w-8 h-8 rounded-full bg-[#393E46] border border-[#00ADB5]/30 flex items-center justify-center">
                             <i class="fas fa-user text-xs"></i>
@@ -67,8 +98,11 @@
                 <?php endif; ?>
             </div>
 
-            <button id="menuBtn" class="md:hidden text-[#00ADB5] text-2xl focus:outline-none">
+            <button id="menuBtn" class="md:hidden text-[#00ADB5] text-2xl focus:outline-none relative">
                 <i class="fas fa-bars-staggered" id="menuIcon"></i>
+                <?php if (isset($_SESSION['user_id']) && $notify_count > 0): ?>
+                    <span class="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border border-[#222831]"></span>
+                <?php endif; ?>
             </button>
         </div>
 
@@ -78,7 +112,16 @@
 
             <?php if (isset($_SESSION['user_id'])): ?>
                 <a href="/list-join-events" class="p-3 rounded-xl bg-[#393E46]/50">กิจกรรมที่เข้าร่วม</a>
-                <a href="/events" class="p-3 rounded-xl bg-[#393E46]/50">กิจกรรมของคุณ</a>
+
+                <a href="/events" class="p-3 rounded-xl bg-[#393E46]/50 flex justify-between items-center text-[#EEEEEE]">
+                    <span>กิจกรรมของคุณ</span>
+                    <?php if ($notify_count > 0): ?>
+                        <span class="bg-red-500 text-white text-xs font-bold px-2.5 py-0.5 rounded-full shadow-lg shadow-red-500/30">
+                            <?= $notify_count ?> รออนุมัติ
+                        </span>
+                    <?php endif; ?>
+                </a>
+
                 <a href="/personal" class="p-3 rounded-xl bg-[#393E46]/50 flex justify-between">
                     โปรไฟล์ <i class="fas fa-chevron-right text-[#00ADB5]"></i>
                 </a>

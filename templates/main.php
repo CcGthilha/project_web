@@ -86,6 +86,16 @@
           $end = new DateTime($row['end_date']);
           $is_live = ($start <= $now && $end >= $now);
           $is_past = ($end < $now);
+
+          // 🌟 โค้ดใหม่: ดึงตัวเลขรับสมัครออกจาก Description ของการ์ดใบนี้
+          $max_limit_main = 0;
+          if (preg_match('/\[MAX:(\d+)\]$/', $row['description'], $matches)) {
+            $max_limit_main = (int)$matches[1];
+          }
+
+          // 🌟 โค้ดใหม่: นับคนและเช็คเต็ม 🌟
+          $current_joined_main = getParticipantCount($row['event_id']);
+          $is_full_main = ($max_limit_main > 0 && $current_joined_main >= $max_limit_main);
       ?>
           <div class="group bg-[#393E46] rounded-[2.5rem] overflow-hidden border border-[#EEEEEE]/5 hover:border-[#00ADB5]/30 transition-all duration-500 shadow-xl flex flex-col <?= $is_past ? 'opacity-60 grayscale-[0.5]' : '' ?>">
 
@@ -114,9 +124,17 @@
                 <?= htmlspecialchars($row['title']) ?>
               </h3>
 
-              <p class="text-xs text-[#EEEEEE]/40 mb-6 flex items-center gap-1">
-                <i class="far fa-user"></i> โดย: <?= htmlspecialchars($row['name']) ?>
-              </p>
+              <div class="text-xs text-[#EEEEEE]/40 mb-6 flex justify-between items-center w-full">
+                <span class="flex items-center gap-1">
+                  <i class="far fa-user"></i> โดย: <?= htmlspecialchars($row['name']) ?>
+                </span>
+
+                <span class="<?= $is_full_main ? 'bg-red-500/10 text-red-400' : 'bg-[#00ADB5]/10 text-[#00ADB5]' ?> px-2 py-1 rounded-md font-bold text-[10px]">
+                  <i class="fas fa-users"></i>
+                  <?= $current_joined_main ?> / <?= $max_limit_main == 0 ? 'ไม่จำกัด' : $max_limit_main ?>
+                  <?= $is_full_main ? ' (เต็ม)' : '' ?>
+                </span>
+              </div>
 
               <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != $row['user_id']): ?>
                 <?php $reg_status = getRegistrationStatus($_SESSION['user_id'], $row['event_id']); ?>
@@ -142,13 +160,19 @@
                 </a>
 
                 <?php if (!$is_past && isset($_SESSION['user_id']) && $_SESSION['user_id'] != $row['user_id'] && !$reg_status): ?>
-                  <form action="/join-event" method="post">
-                    <input type="hidden" name="event_id" value="<?= $row['event_id'] ?>">
-                    <button type="submit" onclick="return confirm('คุณแน่ใจหรือไม่ว่าต้องการเข้าร่วมกิจกรรมนี้?');"
-                      class="w-full py-3 bg-[#00ADB5] text-[#222831] rounded-xl font-bold text-xs hover:shadow-lg shadow-[#00ADB5]/20 transition-all">
-                      เข้าร่วมกิจกรรม
-                    </button>
-                  </form>
+                  <?php if ($is_full_main): ?>
+                    <div class="w-full py-3 bg-red-500/10 text-red-400 text-center rounded-xl font-bold text-xs border border-red-500/20 cursor-not-allowed">
+                      <i class="fas fa-users-slash"></i> กิจกรรมผู้เข้าร่วมเต็มแล้ว
+                    </div>
+                  <?php else: ?>
+                    <form action="/join-event" method="post">
+                      <input type="hidden" name="event_id" value="<?= $row['event_id'] ?>">
+                      <button type="submit" onclick="return confirm('คุณแน่ใจหรือไม่ว่าต้องการเข้าร่วมกิจกรรมนี้?');"
+                        class="w-full py-3 bg-[#00ADB5] text-[#222831] rounded-xl font-bold text-xs hover:shadow-lg shadow-[#00ADB5]/20 transition-all">
+                        เข้าร่วมกิจกรรม
+                      </button>
+                    </form>
+                  <?php endif; ?>
                 <?php endif; ?>
               </div>
             </div>
