@@ -16,7 +16,7 @@
                 </div>
                 <div>
                     <h2 class="text-3xl font-bold text-[#EEEEEE] tracking-tight"><?= htmlspecialchars($data['title']) ?></h2>
-                    <p class="text-[#EEEEEE]/60 text-base font-light font-sans">ตรวจสอบรายละเอียดและอนุมัติผู้เข้าร่วมกิจกรรม</p>
+                    <p class="text-[#EEEEEE]/60 text-base font-light font-sans">ตรวจสอบรายละเอียดและจัดการผู้เข้าร่วมกิจกรรม</p>
                 </div>
             </div>
             <a href="/events" class="text-[#EEEEEE]/60 hover:text-[#00ADB5] transition-all text-sm flex items-center group font-medium font-sans">
@@ -70,6 +70,10 @@
                                             <span class="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-orange-500/10 text-orange-400 text-[10px] font-bold uppercase border border-orange-500/20">
                                                 <span class="w-1.5 h-1.5 bg-orange-400 rounded-full animate-pulse"></span> รอการอนุมัติ
                                             </span>
+                                        <?php elseif ($p['status'] === 'attended'): ?>
+                                            <span class="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-green-500/10 text-green-400 text-[10px] font-bold uppercase border border-green-500/20">
+                                                ✅ เข้าร่วมงานแล้ว
+                                            </span>
                                         <?php elseif ($p['status'] === 'approved'): ?>
                                             <span class="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-[#00ADB5]/10 text-[#00ADB5] text-[10px] font-bold uppercase border border-[#00ADB5]/20">
                                                 อนุมัติแล้ว
@@ -100,7 +104,7 @@
                                                     </button>
                                                 </form>
                                             <?php else: ?>
-                                                <span class="text-[#EEEEEE]/10 text-[10px] font-bold tracking-widest uppercase italic">Completed</span>
+                                                <span class="text-[#EEEEEE]/10 text-[10px] font-bold tracking-widest uppercase italic">COMPLETED</span>
                                             <?php endif; ?>
                                         </div>
                                     </td>
@@ -125,7 +129,7 @@
     <?php include 'footer.php' ?>
 
     <script>
-        // 1. ป๊อปอัพแสดงข้อมูลส่วนตัวผู้สมัคร 🌟
+        // 1. ป๊อปอัพแสดงข้อมูลส่วนตัวผู้สมัคร
         document.querySelectorAll('.btn-view-profile').forEach(btn => {
             btn.addEventListener('click', function() {
                 const data = {
@@ -168,7 +172,7 @@
             });
         });
 
-        // 2. ยืนยันการอนุมัติ/ปฏิเสธ (คงเดิม)
+        // 2. ยืนยันการอนุมัติ/ปฏิเสธ
         const setupConfirm = (selector, title, color, confirmText) => {
             document.querySelectorAll(selector).forEach(btn => {
                 btn.addEventListener('click', function() {
