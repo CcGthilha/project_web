@@ -32,20 +32,7 @@
           $isPast = ($endDate < $now);
 
           // 🌟 โค้ดใหม่: นับคนรออนุมัติ (pending) เฉพาะของกิจกรรมนี้ 🌟
-          global $conn;
-          $pending_count = 0;
-          if ($conn) {
-              $sql_pending = "SELECT COUNT(*) as wait_count FROM registrations WHERE event_id = ? AND status = 'pending'";
-              $stmt_pending = $conn->prepare($sql_pending);
-              if ($stmt_pending) {
-                  $stmt_pending->bind_param("i", $event['event_id']);
-                  $stmt_pending->execute();
-                  $res_pending = $stmt_pending->get_result()->fetch_assoc();
-                  if ($res_pending) {
-                      $pending_count = $res_pending['wait_count'];
-                  }
-              }
-          }
+          $pending_count = getPendingCount($event['event_id']);
         ?>
           <div class="group bg-[#393E46] rounded-[2.5rem] overflow-hidden border border-[#EEEEEE]/5 hover:border-[#00ADB5]/30 transition-all duration-500 shadow-xl flex flex-col <?= $isPast ? 'opacity-75' : '' ?>">
             <div class="relative h-52 overflow-hidden">
@@ -139,6 +126,9 @@
   </main>
 
   <?php include 'footer.php' ?>
+  
 </body>
 
 </html>
+
+

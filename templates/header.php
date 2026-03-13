@@ -63,75 +63,104 @@ if (isset($_SESSION['user_id'])) {
                 </h1>
             </a>
 
-            <div class="hidden md:flex items-center gap-8 text-sm font-medium">
-                <a href="/" class="text-[#EEEEEE] hover:text-[#00ADB5] transition">หน้าแรก</a>
-                <a href="/main" class="text-[#EEEEEE] hover:text-[#00ADB5] transition">กิจกรรมทั้งหมด</a>
+            <div class="hidden md:flex items-center gap-1 text-sm font-medium">
+                <a href="/" class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[#EEEEEE]/70 hover:text-[#00ADB5] hover:bg-[#00ADB5]/10 transition-all group">
+                    <i class="fas fa-home opacity-50 group-hover:opacity-100 transition-opacity"></i> หน้าแรก
+                </a>
+                <a href="/main" class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[#EEEEEE]/70 hover:text-[#00ADB5] hover:bg-[#00ADB5]/10 transition-all group">
+                    <i class="fas fa-compass opacity-50 group-hover:opacity-100 transition-opacity"></i> กิจกรรมทั้งหมด
+                </a>
 
                 <?php if (isset($_SESSION['user_id'])): ?>
-                    <a href="/list-join-events" class="text-[#EEEEEE] hover:text-[#00ADB5] transition">ที่เข้าร่วม</a>
-                    <a href="/events" class="flex items-center gap-1.5 text-[#EEEEEE] hover:text-[#00ADB5] transition">
-                        กิจกรรมของคุณ
+                    <div class="h-6 w-px bg-[#EEEEEE]/10 mx-2"></div>
+
+                    <a href="/list-join-events" class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[#EEEEEE]/70 hover:text-[#00ADB5] hover:bg-[#00ADB5]/10 transition-all group">
+                        <i class="fas fa-ticket-alt opacity-50 group-hover:opacity-100 transition-opacity"></i> ที่เข้าร่วม
+                    </a>
+                    
+                    <a href="/events" class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[#EEEEEE]/70 hover:text-[#00ADB5] hover:bg-[#00ADB5]/10 transition-all group">
+                        <i class="fas fa-tasks opacity-50 group-hover:opacity-100 transition-opacity"></i> กิจกรรมของคุณ
                         <?php if ($notify_count > 0): ?>
-                            <span class="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full animate-pulse shadow-lg shadow-red-500/30">
+                            <span class="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.5)]">
                                 <?= $notify_count > 99 ? '99+' : $notify_count ?>
                             </span>
                         <?php endif; ?>
                     </a>
 
-                    <a href="/personal" class="flex items-center gap-2 hover:text-[#00ADB5] transition">
-                        <div class="w-8 h-8 rounded-full bg-[#393E46] border border-[#00ADB5]/30 flex items-center justify-center">
-                            <i class="fas fa-user text-xs"></i>
+                    <div class="h-6 w-px bg-[#EEEEEE]/10 mx-2"></div>
+
+                    <a href="/personal" class="flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-[#393E46]/50 transition-all group cursor-pointer">
+                        <div class="w-8 h-8 rounded-full bg-[#393E46] border border-[#00ADB5]/30 flex items-center justify-center group-hover:border-[#00ADB5] transition-colors">
+                            <i class="fas fa-user text-xs text-[#00ADB5]"></i>
                         </div>
-                        <span>โปรไฟล์</span>
+                        <span class="text-[#EEEEEE]/90 group-hover:text-white transition-colors">โปรไฟล์</span>
                     </a>
                     <a href="/logout"
-                        class="text-red-400 hover:text-red-300 font-bold transition"
+                        class="w-10 h-10 flex items-center justify-center rounded-xl text-red-400/70 hover:text-red-400 hover:bg-red-500/10 transition-all"
+                        title="ออกจากระบบ"
                         onclick="return confirm('ต้องการออกจากระบบใช่หรือไม่?');">
                         <i class="fas fa-sign-out-alt"></i>
                     </a>
                 <?php else: ?>
-                    <a href="/login" class="text-[#EEEEEE] hover:text-[#00ADB5] transition">เข้าสู่ระบบ</a>
+                    <div class="h-6 w-px bg-[#EEEEEE]/10 mx-2"></div>
+                    <a href="/login" class="px-4 py-2.5 rounded-xl text-[#EEEEEE]/70 hover:text-[#00ADB5] transition-all">เข้าสู่ระบบ</a>
                     <a href="/signup"
-                        class="px-6 py-2.5 bg-[#00ADB5] text-[#222831] rounded-full font-bold hover:shadow-[0_0_20px_rgba(0,173,181,0.4)] transition-all active:scale-95">
+                        class="ml-2 px-6 py-2.5 bg-[#00ADB5] text-[#222831] rounded-full font-bold hover:shadow-[0_0_20px_rgba(0,173,181,0.4)] transition-all active:scale-95">
                         สมัครสมาชิก
                     </a>
                 <?php endif; ?>
             </div>
 
-            <button id="menuBtn" class="md:hidden text-[#00ADB5] text-2xl focus:outline-none relative">
+            <button id="menuBtn" class="md:hidden text-[#00ADB5] text-2xl focus:outline-none relative w-10 h-10 flex items-center justify-center rounded-xl hover:bg-[#00ADB5]/10 transition-colors">
                 <i class="fas fa-bars-staggered" id="menuIcon"></i>
                 <?php if (isset($_SESSION['user_id']) && $notify_count > 0): ?>
-                    <span class="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border border-[#222831]"></span>
+                    <span class="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-[#222831]"></span>
                 <?php endif; ?>
             </button>
         </div>
 
-        <div id="mobileMenu" class="hidden flex flex-col gap-3 mt-5 pb-4 md:hidden">
-            <a href="/" class="p-3 rounded-xl bg-[#393E46]/50 text-[#EEEEEE]">หน้าแรก</a>
-            <a href="/main" class="p-3 rounded-xl bg-[#393E46]/50 text-[#EEEEEE]">กิจกรรมทั้งหมด</a>
+        <div id="mobileMenu" class="hidden flex flex-col gap-2 mt-5 pb-4 md:hidden">
+            <a href="/" class="flex items-center gap-3 p-4 rounded-xl bg-[#393E46]/30 hover:bg-[#393E46]/80 text-[#EEEEEE]/90 transition-colors">
+                <i class="fas fa-home text-[#00ADB5] w-5 text-center"></i> หน้าแรก
+            </a>
+            <a href="/main" class="flex items-center gap-3 p-4 rounded-xl bg-[#393E46]/30 hover:bg-[#393E46]/80 text-[#EEEEEE]/90 transition-colors">
+                <i class="fas fa-compass text-[#00ADB5] w-5 text-center"></i> กิจกรรมทั้งหมด
+            </a>
 
             <?php if (isset($_SESSION['user_id'])): ?>
-                <a href="/list-join-events" class="p-3 rounded-xl bg-[#393E46]/50">กิจกรรมที่เข้าร่วม</a>
+                <div class="h-px w-full bg-[#EEEEEE]/5 my-2"></div>
 
-                <a href="/events" class="p-3 rounded-xl bg-[#393E46]/50 flex justify-between items-center text-[#EEEEEE]">
-                    <span>กิจกรรมของคุณ</span>
+                <a href="/list-join-events" class="flex items-center gap-3 p-4 rounded-xl bg-[#393E46]/30 hover:bg-[#393E46]/80 text-[#EEEEEE]/90 transition-colors">
+                    <i class="fas fa-ticket-alt text-[#00ADB5] w-5 text-center"></i> กิจกรรมที่เข้าร่วม
+                </a>
+
+                <a href="/events" class="flex items-center justify-between p-4 rounded-xl bg-[#393E46]/30 hover:bg-[#393E46]/80 text-[#EEEEEE]/90 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-tasks text-[#00ADB5] w-5 text-center"></i> กิจกรรมของคุณ
+                    </div>
                     <?php if ($notify_count > 0): ?>
-                        <span class="bg-red-500 text-white text-xs font-bold px-2.5 py-0.5 rounded-full shadow-lg shadow-red-500/30">
+                        <span class="bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg shadow-red-500/30">
                             <?= $notify_count ?> รออนุมัติ
                         </span>
                     <?php endif; ?>
                 </a>
 
-                <a href="/personal" class="p-3 rounded-xl bg-[#393E46]/50 flex justify-between">
-                    โปรไฟล์ <i class="fas fa-chevron-right text-[#00ADB5]"></i>
+                <div class="h-px w-full bg-[#EEEEEE]/5 my-2"></div>
+
+                <a href="/personal" class="flex items-center justify-between p-4 rounded-xl bg-[#393E46]/30 hover:bg-[#393E46]/80 text-[#EEEEEE]/90 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-user-circle text-[#00ADB5] w-5 text-center"></i> โปรไฟล์
+                    </div>
+                    <i class="fas fa-chevron-right text-[#EEEEEE]/30 text-xs"></i>
                 </a>
-                <a href="/logout" class="p-3 rounded-xl bg-red-500/10 text-red-400 font-bold"
+                <a href="/logout" class="flex items-center gap-3 p-4 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 font-bold transition-colors"
                     onclick="return confirm('ต้องการออกจากระบบใช่หรือไม่?');">
-                    ออกจากระบบ
+                    <i class="fas fa-sign-out-alt w-5 text-center"></i> ออกจากระบบ
                 </a>
             <?php else: ?>
-                <a href="/login" class="p-3 rounded-xl bg-[#393E46]/50">เข้าสู่ระบบ</a>
-                <a href="/signup" class="p-4 rounded-xl bg-[#00ADB5] text-[#222831] font-bold text-center">สมัครสมาชิก</a>
+                <div class="h-px w-full bg-[#EEEEEE]/5 my-2"></div>
+                <a href="/login" class="p-4 rounded-xl bg-[#393E46]/30 text-center text-[#EEEEEE]/90 hover:bg-[#393E46]/80 transition-colors">เข้าสู่ระบบ</a>
+                <a href="/signup" class="p-4 rounded-xl bg-[#00ADB5] text-[#222831] font-bold text-center shadow-lg shadow-[#00ADB5]/20 active:scale-95 transition-all">สมัครสมาชิก</a>
             <?php endif; ?>
         </div>
     </nav>

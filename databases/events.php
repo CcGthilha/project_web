@@ -175,3 +175,34 @@ function getEventByDateRange(string $start_date, string $end_date): mysqli_resul
     $stmt->execute();
     return $stmt->get_result();
 }
+
+// ฟังก์ชันสำหรับนับจำนวนคนที่ "รออนุมัติ (pending)" ของแต่ละกิจกรรม
+function getPendingCount($event_id) {
+    global $conn;
+    $sql = "SELECT COUNT(*) as total FROM registrations WHERE event_id = ? AND status = 'pending'";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $event_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    
+    return $row['total'] ?? 0;
+}
+
+// ฟังก์ชันสำหรับแยกข้อความ Description และตัวเลขจำนวนรับสูงสุด
+function parseEventDescription($raw_desc) {
+    $max_limit = 0;
+    $clean_desc = $raw_desc;
+    
+    // ค้นหาแท็ก [MAX:...]
+    if (preg_match('/\[MAX:(\d+)\]/i', $raw_desc, $matches)) {
+        $max_limit = (int)$matches[1];
+        $clean_desc = str_replace($matches[0], '', $raw_desc); // ลบแท็กออก
+    }
+    
+    // คืนค่ากลับไปเป็น Array ให้เรียกใช้ง่ายๆ
+    return [
+        'clean_desc' => trim($clean_desc), 
+        'max_limit' => $max_limit
+    ];
+}

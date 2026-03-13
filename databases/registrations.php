@@ -1,4 +1,5 @@
 <?php
+// databases/registrations.php
 // ฟังก์ชันสำหรับบันทึกการเข้าร่วม (สำหรับไฟล์ join-event.php)
 function joinEvent(int $user_id, int $event_id): bool
 {
@@ -10,7 +11,8 @@ function joinEvent(int $user_id, int $event_id): bool
 }
 
 // ฟังก์ชันสำหรับอัปเดตสถานะการเข้าร่วม
-function getRegistrationStatus(int $user_id, int $event_id) {
+function getRegistrationStatus(int $user_id, int $event_id)
+{
 
     global $conn;
     $sql = "SELECT status FROM registrations WHERE user_id = ? AND event_id = ?";
@@ -18,10 +20,10 @@ function getRegistrationStatus(int $user_id, int $event_id) {
     $stmt->bind_param('ii', $user_id, $event_id);
     $stmt->execute();
     $result = $stmt->get_result();
-    
+
     // ถ้าเจอข้อมูล ให้ส่งคำสถานะกลับไป
     if ($row = $result->fetch_assoc()) {
-        return $row['status']; 
+        return $row['status'];
     }
     return false; // ถ้าไม่เจอแปลว่ายังไม่เคยเข้าร่วม
 }
@@ -39,7 +41,7 @@ function isAlreadyJoined(int $user_id, int $event_id): bool
 }
 
 // ฟังก์ชันสำหรับยกเลิกการเข้าร่วมกิจกรรม (ถ้าอยากเพิ่มฟีเจอร์นี้ในอนาคต)
-function cancelRegistration(int $user_id, int $event_id): bool 
+function cancelRegistration(int $user_id, int $event_id): bool
 {
     global $conn;
     // สั่งลบข้อมูลคนที่ตรงกับ user_id และ event_id นี้ทิ้งซะ
@@ -50,10 +52,10 @@ function cancelRegistration(int $user_id, int $event_id): bool
 }
 
 // ฟังก์ชันสำหรับดึงกิจกรรมที่ผู้ใช้เข้าร่วม พร้อมสถานะการเข้าร่วม (สำหรับหน้า list-join-events.php)
-function getJoinedEventsByUser(int $user_id, string $status = 'all'): mysqli_result|bool 
+function getJoinedEventsByUser(int $user_id, string $status = 'all'): mysqli_result|bool
 {
     global $conn;
-    
+
     // ดึงข้อมูลกิจกรรม + ชื่อคนสร้าง + รูปภาพ + สถานะการเข้าร่วม
     $sql = "SELECT e.*, u.name AS creator_name, ei.image_path, r.status AS join_status
             FROM events e
@@ -66,7 +68,7 @@ function getJoinedEventsByUser(int $user_id, string $status = 'all'): mysqli_res
     if ($status !== 'all') {
         $sql .= " AND r.status = ?";
     }
-    
+
     // จัดกลุ่มและเรียงตามวันที่เริ่มกิจกรรม
     $sql .= " GROUP BY e.event_id ORDER BY e.start_date ASC";
 
@@ -87,6 +89,45 @@ function getJoinedEventsByUser(int $user_id, string $status = 'all'): mysqli_res
 function updateRegistrationStatus(int $reg_id, string $status): bool
 {
     global $conn;
+
+    // 🌟 ดักจับเฉพาะเวลากด "อนุมัติ" ('approved') เท่านั้น
+    if ($status === 'approved') {
+        // 1. หาว่านี่คืองาน(event_id)อะไร จาก reg_id ที่ส่งมา
+        $sql_find_event = "SELECT event_id FROM registrations WHERE registrations_id = ?";
+        $stmt_find = $conn->prepare($sql_find_event);
+        $stmt_find->bind_param('i', $reg_id);
+        $stmt_find->execute();
+        $res_find = $stmt_find->get_result()->fetch_assoc();
+
+        if ($res_find) {
+            $event_id = $res_find['event_id'];
+
+            // 2. ดึงข้อมูลงานมาเช็คขีดจำกัด
+            $stmt_check = $conn->prepare("SELECT description FROM events WHERE event_id = ?");
+            $stmt_check->bind_param("i", $event_id);
+            $stmt_check->execute();
+            $event_data = $stmt_check->get_result()->fetch_assoc();
+
+            if ($event_data) {
+                $max_limit = 0;
+                if (preg_match('/\[MAX:(\d+)\]/i', $event_data['description'], $matches)) {
+                    $max_limit = (int)$matches[1];
+                }
+
+                // 3. ถ้าจำกัดคน ให้เช็คว่าเต็มหรือยัง
+                if ($max_limit > 0) {
+                    $current_approved = getParticipantCount($event_id); // ใช้ฟังก์ชันที่คุณมีอยู่แล้ว
+
+                    // 🛑 ถ้าเต็มแล้ว ห้ามอนุมัติเด็ดขาด คืนค่า false ทันที!
+                    if ($current_approved >= $max_limit) {
+                        return false;
+                    }
+                }
+            }
+        }
+    }
+
+    // 🌟 ถ้าสถานะเป็น 'rejected', 'pending' หรือ สถานะ 'approved' ผ่านการเช็คคนเต็มมาแล้ว ถึงจะรันคำสั่งนี้ได้
     $sql = "UPDATE registrations SET status = ? WHERE registrations_id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('si', $status, $reg_id);
@@ -95,34 +136,36 @@ function updateRegistrationStatus(int $reg_id, string $status): bool
 
 // database/registrations.php
 // 1. ฟังก์ชันสร้างรหัส OTP แบบไม่พึ่งฐานข้อมูล (คำนวณตามเวลา 30 นาที)
-function generateStatelessOTP(int $user_id, int $event_id, $timestamp = null) {
+function generateStatelessOTP(int $user_id, int $event_id, $timestamp = null)
+{
     // กำหนด Secret Key ของเว็บเรา (ตั้งเป็นคำอะไรก็ได้)
-    $secret_key = "MySuperSecretEventKey2026"; 
-    
+    $secret_key = "MySuperSecretEventKey2026";
+
     if ($timestamp === null) {
         $timestamp = time(); // ใช้เวลาปัจจุบัน
     }
-    
+
     // แบ่งเวลาเป็นบล็อก บล็อกละ 30 นาที (1800 วินาที)
     $time_window = floor($timestamp / 1800);
-    
+
     // นำ ID ผู้ใช้ + ID งาน + บล็อกเวลา มาผสมกัน
     $data_string = $user_id . '_' . $event_id . '_' . $time_window;
-    
+
     // เข้ารหัสด้วย HMAC SHA256 เพื่อความปลอดภัย
     $hash = hash_hmac('sha256', $data_string, $secret_key);
-    
+
     // แปลงตัวอักษรเป็นตัวเลข แล้วตัดมาแค่ 6 หลัก
     $dec = hexdec(substr($hash, 0, 8));
     $otp = str_pad($dec % 1000000, 6, '0', STR_PAD_LEFT);
-    
+
     return $otp;
 }
 
 // 2. ฟังก์ชันสำหรับผู้จัด เพื่อวนลูปหาว่ารหัสนี้เป็นของใคร
-function verifyStatelessOTP(int $event_id, string $input_otp) {
+function verifyStatelessOTP(int $event_id, string $input_otp)
+{
     global $conn;
-    
+
     // โค้ดใหม่: ดึง "ทุกคน" ที่อยู่ในงานนี้มาเช็ค (ตัด WHERE r.status = 'approved' ออก)
     $sql = "SELECT r.registrations_id, r.status, u.user_id, u.name 
             FROM registrations r 
@@ -132,16 +175,16 @@ function verifyStatelessOTP(int $event_id, string $input_otp) {
     $stmt->bind_param('i', $event_id);
     $stmt->execute();
     $result = $stmt->get_result();
-    
+
     $current_time = time();
-    
+
     while ($row = $result->fetch_assoc()) {
         $expected_otp_current = generateStatelessOTP($row['user_id'], $event_id, $current_time);
         $expected_otp_prev = generateStatelessOTP($row['user_id'], $event_id, $current_time - 1800);
-        
+
         // ถ้ารหัสที่กรอกมา ตรงกับรหัสของคนๆ นี้
         if ($input_otp === $expected_otp_current || $input_otp === $expected_otp_prev) {
-            
+
             // เช็คสถานะว่าเป็นอะไร
             if ($row['status'] === 'approved') {
                 return [
@@ -149,7 +192,7 @@ function verifyStatelessOTP(int $event_id, string $input_otp) {
                     'registrations_id' => $row['registrations_id'],
                     'name' => $row['name']
                 ];
-            } else if ($row['status'] === 'attended') { 
+            } else if ($row['status'] === 'attended') {
                 // หมายเหตุ: ถ้าในฐานข้อมูลคุณใช้คำอื่นแทน attended (เช่น joined) ให้แก้ตรงนี้นะครับ
                 return [
                     'result' => 'already_used', // รหัสถูก แต่ใช้ไปแล้ว
@@ -158,15 +201,16 @@ function verifyStatelessOTP(int $event_id, string $input_otp) {
             }
         }
     }
-    
+
     // ถ้าวนลูปจนครบทุกคนแล้วรหัสยังไม่ตรงกับใครเลย
     return [
         'result' => 'invalid' // รหัสผิด หรือ หมดเวลา
-    ]; 
+    ];
 }
 
 //ฟังก์ชันสำหรับเปลี่ยนสถานะว่า "เข้าร่วมงานแล้ว"
-function markAsAttended(int $registrations_id) {
+function markAsAttended(int $registrations_id)
+{
     global $conn;
     // เปลี่ยนสถานะจาก approved เป็น attended (ถ้าฐานข้อมูลคุณใช้คำอื่น เช่น 'joined' ให้แก้ตรงนี้นะครับ)
     $sql = "UPDATE registrations SET status = 'attended' WHERE registrations_id = ?";
@@ -190,9 +234,10 @@ function getParticipantsByEventId(int $event_id): mysqli_result|bool
     return $stmt->get_result();
 }
 
-function getParticipantCount($event_id) {
+function getParticipantCount($event_id)
+{
     global $conn; // ใช้ตัวแปรเชื่อมต่อฐานข้อมูลของคุณ
-    
+
     // นับเฉพาะคนที่สถานะเป็น approved (อนุมัติแล้ว) หรือ attended (เข้าร่วมแล้ว)
     $sql = "SELECT COUNT(*) as total FROM registrations WHERE event_id = ? AND status IN ('approved', 'attended')";
     $stmt = $conn->prepare($sql);
@@ -200,6 +245,6 @@ function getParticipantCount($event_id) {
     $stmt->execute();
     $result = $stmt->get_result();
     $row = $result->fetch_assoc();
-    
+
     return $row['total'] ?? 0;
 }

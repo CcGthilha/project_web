@@ -24,7 +24,12 @@
             </a>
         </div>
 
-        <?php if (isset($data['event'])): $row = $data['event']; ?>
+        <?php if (isset($data['event'])):
+            $row = $data['event'];
+            $parsed_desc = parseEventDescription($row['description']);
+            $clean_desc = $parsed_desc['clean_desc'];
+            $current_max = $parsed_desc['max_limit'];
+        ?>
             <form action="/edit-event" method="POST" enctype="multipart/form-data" class="space-y-8">
                 <input type="hidden" name="event_id" value="<?= $row['event_id'] ?>">
 
@@ -33,10 +38,43 @@
                         <i class="fas fa-images"></i> จัดการรูปภาพ
                     </h3>
 
-                    <label class="text-xs text-[#EEEEEE]/40 uppercase font-bold tracking-widest block mb-4">รูปภาพปัจจุบัน (เลือกเพื่อลบ)</label>
+                    <?php
+                    // 🌟 ดึงรูปทั้งหมดมาหั่นแยก "รูปปก" กับ "รูปเพิ่มเติม"
+                    $all_images = $data['images'] ?? [];
+                    $cover_id = null;
+                    $cover_path = null;
+                    $gallery_images = [];
+
+                    if (!empty($all_images)) {
+                        // ดึงรูปแรกสุดออกมาเป็นรูปปก
+                        reset($all_images);
+                        $cover_id = key($all_images);
+                        $cover_path = array_shift($all_images);
+                        // ที่เหลือคือรูปเพิ่มเติม
+                        $gallery_images = $all_images;
+                    }
+                    ?>
+
+                    <div class="mb-8">
+                        <label class="text-xs text-[#00ADB5] uppercase font-bold tracking-widest block mb-4">รูปปกกิจกรรมปัจจุบัน</label>
+                        <?php if ($cover_path): ?>
+                            <div class="w-full sm:w-1/2 md:w-1/3 relative group cursor-pointer">
+                                <img src="<?= $cover_path ?>" class="w-full aspect-video object-cover rounded-2xl border-4 border-[#00ADB5]/30 group-hover:border-red-500 transition-all shadow-lg">
+                                <div class="absolute inset-0 bg-red-500/0 group-hover:bg-red-500/20 rounded-2xl transition-all flex items-center justify-center">
+                                    <input type="checkbox" name="delete_images[]" value="<?= $cover_id ?>" class="w-6 h-6 accent-red-500 transform scale-150 shadow-sm">
+                                </div>
+                                <span class="absolute -top-3 -right-3 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">ลบรูปปก</span>
+                            </div>
+                            <p class="text-[10px] text-red-400 mt-2">* หากลบรูปปก รูปเพิ่มเติมถัดไปจะกลายเป็นรูปปกแทนโดยอัตโนมัติ</p>
+                        <?php else: ?>
+                            <p class="text-[#EEEEEE]/20 text-sm italic">ไม่มีรูปปก</p>
+                        <?php endif; ?>
+                    </div>
+
+                    <label class="text-xs text-[#EEEEEE]/40 uppercase font-bold tracking-widest block mb-4">รูปเพิ่มเติม (เลือกเพื่อลบ)</label>
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-                        <?php if (!empty($data['images'])): ?>
-                            <?php foreach ($data['images'] as $img_id => $img_path): ?>
+                        <?php if (!empty($gallery_images)): ?>
+                            <?php foreach ($gallery_images as $img_id => $img_path): ?>
                                 <label class="relative group cursor-pointer">
                                     <img src="<?= $img_path ?>" class="w-full aspect-square object-cover rounded-2xl border-2 border-transparent group-hover:border-red-500 transition-all">
                                     <div class="absolute inset-0 bg-red-500/0 group-hover:bg-red-500/20 rounded-2xl transition-all flex items-center justify-center">
@@ -46,12 +84,12 @@
                                 </label>
                             <?php endforeach; ?>
                         <?php else: ?>
-                            <p class="text-[#EEEEEE]/20 text-sm italic col-span-full">ยังไม่มีรูปภาพประกอบ</p>
+                            <p class="text-[#EEEEEE]/20 text-sm italic col-span-full">ไม่มีรูปเพิ่มเติม</p>
                         <?php endif; ?>
                     </div>
 
-                    <div class="space-y-2">
-                        <label for="new_images" class="text-xs text-[#EEEEEE]/40 uppercase font-bold tracking-widest block">เพิ่มรูปภาพเพิ่มเติม</label>
+                    <div class="space-y-2 pt-6 border-t border-[#EEEEEE]/10">
+                        <label for="new_images" class="text-xs text-[#EEEEEE]/80 font-bold block">อัปโหลดรูปภาพใหม่เพิ่ม <span class="text-[#EEEEEE]/40 font-normal">(สามารถเลือกได้หลายรูป)</span></label>
                         <input type="file" id="new_images" name="new_images[]" accept="image/*" multiple
                             class="w-full bg-[#222831] border border-[#393E46] rounded-xl py-3 px-4 text-[#EEEEEE] text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#00ADB5]/10 file:text-[#00ADB5] hover:file:bg-[#00ADB5]/20 cursor-pointer">
                     </div>
@@ -73,7 +111,17 @@
                         <label for="description" class="text-xs text-[#EEEEEE]/50 ml-2">รายละเอียดกิจกรรม</label>
                         <textarea id="description" name="description" rows="5" required
                             class="w-full bg-[#222831] border border-[#393E46] rounded-xl py-3.5 px-4 text-[#EEEEEE] focus:outline-none focus:border-[#00ADB5] transition-all resize-none"
-                            placeholder="บรรยายเกี่ยวกับกิจกรรมนี้..."><?= htmlspecialchars($row['description']) ?></textarea>
+                            placeholder="บรรยายเกี่ยวกับกิจกรรมนี้..."><?= htmlspecialchars($clean_desc) ?></textarea>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="max_participants" class="text-xs text-[#EEEEEE]/50 ml-2">จำนวนผู้เข้าร่วมสูงสุด (ระบุ 0 หากไม่จำกัด)</label>
+                        <div class="relative">
+                            <i class="fas fa-users absolute left-5 top-1/2 -translate-y-1/2 text-[#00ADB5]"></i>
+                            <input type="number" id="max_participants" name="max_participants"
+                                min="0" max="99999" value="<?= $current_max ?>" required
+                                class="w-full bg-[#222831] border border-[#393E46] rounded-xl py-4 pl-12 pr-5 text-[#EEEEEE] focus:outline-none focus:border-[#00ADB5] transition">
+                        </div>
                     </div>
 
                     <div class="space-y-2">
