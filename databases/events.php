@@ -53,7 +53,7 @@ function getEventsByUserId(int $id): mysqli_result|bool
 
 function getEventByKeyword(string $keyword): mysqli_result|bool
 {
-    $conn = getConnection();
+    global $conn;
     $sql = 'select * from events e join users u on e.user_id = u.user_id join 
     event_images ei on e.event_id = ei.event_id where e.title like ? or u.name like ? 
     GROUP BY e.event_id';
@@ -97,7 +97,7 @@ function deleteEvent(int $event_id): bool
     $res_img = $stmt_get_img->get_result();
 
     if ($row_img = $res_img->fetch_assoc()) {
-        $file_path = '../public' . $row_img['image_path'];
+        $file_path = __DIR__ . '/..' . $row_img['image_path'];
         if (file_exists($file_path) && !empty($row_img['image_path'])) {
             unlink($file_path);
         }
@@ -148,7 +148,8 @@ function deleteImageById(int $image_id): bool
     $stmt->execute();
     $res = $stmt->get_result();
     if ($row = $res->fetch_assoc()) {
-        $file_path = '../public' . $row['image_path'];
+        // แก้ตรงนี้ จาก '../public' เป็น __DIR__ . '/..'
+        $file_path = __DIR__ . '/..' . $row['image_path'];
         if (file_exists($file_path)) unlink($file_path);
     }
 
@@ -177,7 +178,8 @@ function getEventByDateRange(string $start_date, string $end_date): mysqli_resul
 }
 
 // ฟังก์ชันสำหรับนับจำนวนคนที่ "รออนุมัติ (pending)" ของแต่ละกิจกรรม
-function getPendingCount($event_id) {
+function getPendingCount($event_id)
+{
     global $conn;
     $sql = "SELECT COUNT(*) as total FROM registrations WHERE event_id = ? AND status = 'pending'";
     $stmt = $conn->prepare($sql);
@@ -185,24 +187,25 @@ function getPendingCount($event_id) {
     $stmt->execute();
     $result = $stmt->get_result();
     $row = $result->fetch_assoc();
-    
+
     return $row['total'] ?? 0;
 }
 
 // ฟังก์ชันสำหรับแยกข้อความ Description และตัวเลขจำนวนรับสูงสุด
-function parseEventDescription($raw_desc) {
+function parseEventDescription($raw_desc)
+{
     $max_limit = 0;
     $clean_desc = $raw_desc;
-    
+
     // ค้นหาแท็ก [MAX:...]
     if (preg_match('/\[MAX:(\d+)\]/i', $raw_desc, $matches)) {
         $max_limit = (int)$matches[1];
         $clean_desc = str_replace($matches[0], '', $raw_desc); // ลบแท็กออก
     }
-    
+
     // คืนค่ากลับไปเป็น Array ให้เรียกใช้ง่ายๆ
     return [
-        'clean_desc' => trim($clean_desc), 
+        'clean_desc' => trim($clean_desc),
         'max_limit' => $max_limit
     ];
 }

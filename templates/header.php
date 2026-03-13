@@ -25,6 +25,49 @@
             -webkit-text-fill-color: transparent;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+    <script>
+        // สร้างฟังก์ชันกลางสำหรับตั้งค่าเริ่มต้นของ SweetAlert2 ในเว็บเรา
+        const MySwal = Swal.mixin({
+            background: '#222831',
+            color: '#EEEEEE',
+            confirmButtonColor: '#00ADB5',
+            cancelButtonColor: '#393E46',
+            borderRadius: '1.5rem',
+            customClass: {
+                popup: 'rounded-[2.5rem] border border-[#EEEEEE]/10 shadow-2xl'
+            },
+            showClass: {
+                popup: 'animate__animated animate__fadeInUp animate__faster'
+            },
+            hideClass: {
+                popup: 'animate__animated animate__fadeOutDown animate__faster'
+            }
+        });
+
+        // 2. เช็ค Session ทันทีที่โหลดหน้าเสร็จ (ถ้ามีข้อความค้างอยู่ให้เด้งทันที)
+        document.addEventListener('DOMContentLoaded', function() {
+            <?php if (isset($_SESSION['msg_success'])): ?>
+                MySwal.fire({
+                    icon: 'success',
+                    title: 'สำเร็จ!',
+                    text: '<?= $_SESSION['msg_success'] ?>',
+                });
+                <?php unset($_SESSION['msg_success']); ?>
+            <?php endif; ?>
+
+            <?php if (isset($_SESSION['msg_error'])): ?>
+                MySwal.fire({
+                    icon: 'error',
+                    title: 'แจ้งเตือน',
+                    text: '<?= $_SESSION['msg_error'] ?>',
+                });
+                <?php unset($_SESSION['msg_error']); ?>
+            <?php endif; ?>
+        });
+    </script>
 </head>
 
 <?php
@@ -77,7 +120,7 @@ if (isset($_SESSION['user_id'])) {
                     <a href="/list-join-events" class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[#EEEEEE]/70 hover:text-[#00ADB5] hover:bg-[#00ADB5]/10 transition-all group">
                         <i class="fas fa-ticket-alt opacity-50 group-hover:opacity-100 transition-opacity"></i> ที่เข้าร่วม
                     </a>
-                    
+
                     <a href="/events" class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[#EEEEEE]/70 hover:text-[#00ADB5] hover:bg-[#00ADB5]/10 transition-all group">
                         <i class="fas fa-tasks opacity-50 group-hover:opacity-100 transition-opacity"></i> กิจกรรมของคุณ
                         <?php if ($notify_count > 0): ?>
@@ -96,9 +139,9 @@ if (isset($_SESSION['user_id'])) {
                         <span class="text-[#EEEEEE]/90 group-hover:text-white transition-colors">โปรไฟล์</span>
                     </a>
                     <a href="/logout"
+                        id="btn-logout-desktop"
                         class="w-10 h-10 flex items-center justify-center rounded-xl text-red-400/70 hover:text-red-400 hover:bg-red-500/10 transition-all"
-                        title="ออกจากระบบ"
-                        onclick="return confirm('ต้องการออกจากระบบใช่หรือไม่?');">
+                        title="ออกจากระบบ">
                         <i class="fas fa-sign-out-alt"></i>
                     </a>
                 <?php else: ?>
@@ -153,8 +196,9 @@ if (isset($_SESSION['user_id'])) {
                     </div>
                     <i class="fas fa-chevron-right text-[#EEEEEE]/30 text-xs"></i>
                 </a>
-                <a href="/logout" class="flex items-center gap-3 p-4 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 font-bold transition-colors"
-                    onclick="return confirm('ต้องการออกจากระบบใช่หรือไม่?');">
+                <a href="/logout"
+                    id="btn-logout-mobile"
+                    class="flex items-center gap-3 p-4 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 font-bold transition-colors">
                     <i class="fas fa-sign-out-alt w-5 text-center"></i> ออกจากระบบ
                 </a>
             <?php else: ?>
@@ -176,4 +220,32 @@ if (isset($_SESSION['user_id'])) {
         icon.classList.toggle("fa-bars-staggered");
         icon.classList.toggle("fa-xmark");
     });
+</script>
+<script>
+    // ฟังก์ชันกลางสำหรับยืนยันการออกจากระบบ
+    const handleLogout = (e) => {
+        e.preventDefault(); // ป้องกันการเปลี่ยนหน้าทันที
+        const logoutUrl = e.currentTarget.getAttribute('href');
+
+        MySwal.fire({
+            title: '<span class="text-[#EEEEEE]">ออกจากระบบ?</span>',
+            text: "คุณต้องการออกจากระบบใช่หรือไม่?",
+            icon: 'warning',
+            iconColor: '#ef4444',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444', // สีแดงเพื่อให้ดูเด่นชัด
+            cancelButtonColor: '#393E46',
+            confirmButtonText: 'ใช่, ออกจากระบบ',
+            cancelButtonText: 'ยกเลิก',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = logoutUrl;
+            }
+        });
+    };
+
+    // ผูกเหตุการณ์กับปุ่มทั้ง Desktop และ Mobile
+    document.getElementById('btn-logout-desktop')?.addEventListener('click', handleLogout);
+    document.getElementById('btn-logout-mobile')?.addEventListener('click', handleLogout);
 </script>

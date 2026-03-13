@@ -1,10 +1,8 @@
 <!DOCTYPE html>
 <html lang="th">
-<!-- /templates/create-event.php -->
 
 <head>
     <title>สร้างกิจกรรมใหม่ | Event for you</title>
-
 </head>
 
 <body class="bg-[#222831]">
@@ -19,7 +17,7 @@
             <p class="text-[#EEEEEE]/50 mt-2">กรอกรายละเอียดกิจกรรมของคุณให้ครบถ้วนเพื่อเริ่มรับลงทะเบียน</p>
         </div>
 
-        <form action="/create-event" method="POST" enctype="multipart/form-data" class="space-y-8">
+        <form id="create-event-form" action="/create-event" method="POST" enctype="multipart/form-data" class="space-y-8">
 
             <div class="bg-[#393E46] p-8 rounded-[2.5rem] border border-[#EEEEEE]/5 shadow-xl">
                 <h3 class="text-[#00ADB5] font-bold text-sm uppercase tracking-widest mb-6 flex items-center gap-2">
@@ -97,7 +95,7 @@
             </div>
 
             <div class="pt-6">
-                <button type="submit"
+                <button type="button" id="btn-submit-event"
                     class="w-full py-5 bg-[#00ADB5] text-[#222831] rounded-[1.5rem] font-bold text-xl hover:shadow-[0_15px_35px_rgba(0,173,181,0.3)] hover:scale-[1.01] active:scale-95 transition-all flex items-center justify-center gap-3">
                     <i class="fas fa-plus-circle"></i> ยืนยันการสร้างกิจกรรม
                 </button>
@@ -107,6 +105,96 @@
     </main>
 
     <?php include 'footer.php' ?>
+
+    <script>
+        document.getElementById('btn-submit-event')?.addEventListener('click', function() {
+            const form = document.getElementById('create-event-form');
+            const title = document.getElementById('title').value.trim();
+            const startVal = document.getElementById('start_date').value;
+            const endVal = document.getElementById('end_date').value;
+
+            if (!title || !startVal || !endVal) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'กรุณากรอกข้อมูลให้ครบ',
+                    background: '#222831',
+                    color: '#EEEEEE',
+                    confirmButtonColor: '#00ADB5'
+                });
+                return;
+            }
+            const maxParticipants = parseInt(document.getElementById('max_participants').value);
+
+            if (maxParticipants < 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'จำนวนผู้เข้าร่วมไม่ถูกต้อง',
+                    text: 'จำนวนผู้เข้าร่วมสูงสุดต้องไม่ติดลบ (ระบุ 0 หากไม่จำกัด)',
+                    background: '#222831',
+                    color: '#EEEEEE',
+                    confirmButtonColor: '#00ADB5',
+                    customClass: {
+                        popup: 'rounded-[2.5rem] border border-[#EEEEEE]/10'
+                    }
+                });
+                return;
+            }
+
+            const startDate = new Date(startVal);
+            const endDate = new Date(endVal);
+
+            // เช็คเงื่อนไขวันที่สิ้นสุดต้องไม่ก่อนวันที่เริ่ม
+            if (endDate <= startDate) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'วันเวลาไม่ถูกต้อง',
+                    text: 'วันที่สิ้นสุดงาน จะต้องมาหลังวันที่เริ่มงานนะครับ',
+                    background: '#222831',
+                    color: '#EEEEEE',
+                    confirmButtonColor: '#00ADB5',
+                    customClass: {
+                        popup: 'rounded-[2.5rem] border border-[#EEEEEE]/10'
+                    }
+                });
+                return;
+            }
+
+            // แสดง Confirm สไตล์เดียวกับหน้าอื่น
+            Swal.fire({
+                title: '<span class="text-[#EEEEEE]">ยืนยันการสร้างกิจกรรม?</span>',
+                html: `<p class="text-[#EEEEEE]/60">คุณต้องการสร้างกิจกรรม <br><b class="text-[#00ADB5]">${title}</b> ใช่หรือไม่?</p>`,
+                icon: 'question',
+                iconColor: '#00ADB5',
+                showCancelButton: true,
+                confirmButtonColor: '#00ADB5',
+                cancelButtonColor: '#393E46',
+                confirmButtonText: 'ใช่, สร้างเลย',
+                cancelButtonText: 'แก้ไขข้อมูล',
+                background: '#222831',
+                color: '#EEEEEE',
+                borderRadius: '1.5rem',
+                reverseButtons: true,
+                customClass: {
+                    popup: 'rounded-[2.5rem] border border-[#EEEEEE]/10 shadow-2xl',
+                    confirmButton: 'px-6 py-3 rounded-xl font-bold',
+                    cancelButton: 'px-6 py-3 rounded-xl font-bold'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'กำลังดำเนินการ...',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        },
+                        background: '#222831',
+                        color: '#EEEEEE'
+                    });
+                    form.submit();
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

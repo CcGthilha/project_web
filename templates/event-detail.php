@@ -1,10 +1,7 @@
 <!DOCTYPE html>
 <html lang="th">
-<!-- /templates/event-detail.php -->
-
 <head>
     <title><?= htmlspecialchars($data['title']) ?> | Event for you</title>
-
 </head>
 
 <body class="bg-[#222831]">
@@ -15,27 +12,23 @@
     $clean_desc = '';
     $max_limit = 0;
     $current_joined = 0;
-    $is_full = false;  //ตัวแปรเช็คคนเต็ม
+    $is_full = false;
 
     if ($event) {
         $now = new DateTime();
         $endDate = new DateTime($event['end_date']);
-        $isPast = ($endDate < $now); // เช็คว่ากิจกรรมจบหรือยัง
+        $isPast = ($endDate < $now);
 
         $raw_desc = $event['description'];
         $clean_desc = $raw_desc;
 
-        // 🌟 ค้นหาแท็ก [MAX:ตัวเลข] 🌟
         if (preg_match('/\[MAX:(\d+)\]/i', $raw_desc, $matches)) {
             $max_limit = (int)$matches[1];
-            // ลบแท็ก [MAX:...] ออก เพื่อให้เหลือแค่ข้อความล้วนๆ สำหรับแสดงผล
             $clean_desc = str_replace($matches[0], '', $raw_desc);
         }
 
-        // 🌟 ดึงจำนวนคนที่เข้าร่วมแล้ว
         $current_joined = getParticipantCount($event['event_id']);
 
-        // 🌟 เช็คว่าจำนวนคนปัจจุบัน มากกว่าหรือเท่ากับที่รับสมัครหรือไม่ (และต้องไม่ใช่ 0 คือไม่จำกัด)
         if ($max_limit > 0 && $current_joined >= $max_limit) {
             $is_full = true;
         }
@@ -53,8 +46,7 @@
                     <?php if (!empty($data['images'])): ?>
                         <?php foreach ($data['images'] as $img): ?>
                             <div class="shrink-0 snap-center">
-                                <img src="<?= htmlspecialchars($img) ?>"
-                                    class="w-[300px] md:w-[450px] h-[200px] md:h-[300px] object-cover rounded-[2rem] border border-[#393E46] shadow-xl">
+                                <img src="<?= htmlspecialchars($img) ?>" class="w-[300px] md:w-[450px] h-[200px] md:h-[300px] object-cover rounded-[2rem] border border-[#393E46] shadow-xl">
                             </div>
                         <?php endforeach; ?>
                     <?php else: ?>
@@ -94,7 +86,6 @@
                                     <p class="text-[#EEEEEE] font-medium"><?= htmlspecialchars($event['location']) ?></p>
                                 </div>
                             </div>
-
                             <div class="flex items-start gap-4">
                                 <div class="w-10 h-10 bg-[#00ADB5]/10 rounded-xl flex items-center justify-center text-[#00ADB5] shrink-0">
                                     <i class="fas fa-calendar-alt"></i>
@@ -104,7 +95,6 @@
                                     <p class="text-[#EEEEEE] font-medium"><?= date('d M Y - H:i', strtotime($event['start_date'])) ?> น.</p>
                                 </div>
                             </div>
-
                             <div class="flex items-start gap-4">
                                 <div class="w-10 h-10 bg-[#00ADB5]/10 rounded-xl flex items-center justify-center text-[#00ADB5] shrink-0">
                                     <i class="fas fa-clock"></i>
@@ -119,13 +109,10 @@
                         <div class="space-y-4">
                             <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $event['user_id']): ?>
                                 <div class="grid grid-cols-2 gap-3">
-                                    <a href="/edit-event?id=<?= $event['event_id'] ?>"
-                                        class="flex items-center justify-center py-3 bg-[#222831] text-[#EEEEEE] rounded-xl font-bold border border-[#EEEEEE]/10 hover:border-[#00ADB5] transition-all text-sm">
+                                    <a href="/edit-event?id=<?= $event['event_id'] ?>" class="flex items-center justify-center py-3 bg-[#222831] text-[#EEEEEE] rounded-xl font-bold border border-[#EEEEEE]/10 hover:border-[#00ADB5] transition-all text-sm">
                                         <i class="fas fa-edit mr-2"></i> แก้ไข
                                     </a>
-                                    <a href="/delete-event?id=<?= $event['event_id'] ?>"
-                                        onclick="return confirm('ยืนยันการลบกิจกรรมนี้?')"
-                                        class="flex items-center justify-center py-3 bg-red-500/10 text-red-400 rounded-xl font-bold border border-red-400/20 hover:bg-red-500 hover:text-white transition-all text-sm">
+                                    <a href="#" data-url="/delete-event?id=<?= $event['event_id'] ?>" class="btn-confirm-delete flex items-center justify-center py-3 bg-red-500/10 text-red-400 rounded-xl font-bold border border-red-400/20 hover:bg-red-500 hover:text-white transition-all text-sm">
                                         <i class="fas fa-trash mr-2"></i> ลบ
                                     </a>
                                 </div>
@@ -137,95 +124,122 @@
                                         </button>
                                     </form>
                                 <?php else: ?>
-                                    <div class="w-full py-4 bg-[#222831]/50 text-[#EEEEEE]/20 text-center rounded-2xl font-bold text-sm border border-[#EEEEEE]/5 cursor-default mt-2">
-                                        กิจกรรมสิ้นสุดแล้ว
-                                    </div>
+                                    <div class="w-full py-4 bg-[#222831]/50 text-[#EEEEEE]/20 text-center rounded-2xl font-bold text-sm border border-[#EEEEEE]/5 cursor-default mt-2">กิจกรรมสิ้นสุดแล้ว</div>
                                 <?php endif; ?>
 
                             <?php elseif (isset($_SESSION['user_id'])): ?>
                                 <?php $reg_status = getRegistrationStatus($_SESSION['user_id'], $event['event_id']); ?>
-
                                 <?php if ($reg_status === 'pending'): ?>
                                     <div class="bg-orange-500/10 p-4 rounded-2xl border border-orange-500/20 text-center space-y-3">
-                                        <p class="text-orange-400 font-bold text-sm italic tracking-wide">⏳ กำลังรอการอนุมัติ...</p>
+                                        <p class="text-orange-400 font-bold text-sm italic tracking-wide">⏳ กำลังรอการอนุมัติ... </p>
                                         <?php if (!$isPast): ?>
-                                            <form action="/cancel-join" method="post">
+                                            <form action="/cancel-join" method="post" id="form-cancel-join">
                                                 <input type="hidden" name="event_id" value="<?= $event['event_id'] ?>">
-                                                <button type="submit" class="text-xs text-[#EEEEEE]/30 hover:text-red-400 underline" onclick="return confirm('ยกเลิกคำขอ?')">ยกเลิกคำขอเข้าร่วม</button>
+                                                <button type="button" class="btn-confirm-cancel text-xs text-[#EEEEEE]/30 hover:text-red-400 underline">ยกเลิกคำขอเข้าร่วม</button>
                                             </form>
                                         <?php endif; ?>
                                     </div>
-
                                 <?php elseif ($reg_status === 'approved'): ?>
                                     <div class="space-y-3">
-                                        <div class="bg-[#00ADB5]/10 p-4 rounded-2xl border border-[#00ADB5]/20 text-center">
-                                            <p class="text-[#00ADB5] font-bold">✅ อนุมัติแล้ว!</p>
-                                        </div>
+                                        <div class="bg-[#00ADB5]/10 p-4 rounded-2xl border border-[#00ADB5]/20 text-center"><p class="text-[#00ADB5] font-bold">✅ อนุมัติแล้ว!</p></div>
                                         <?php if (!$isPast): ?>
                                             <form action="/otp-user" method="post">
                                                 <input type="hidden" name="event_id" value="<?= $event['event_id'] ?>">
-                                                <button type="submit" class="w-full py-4 bg-[#00ADB5] text-[#222831] rounded-2xl font-bold shadow-lg shadow-[#00ADB5]/20 hover:scale-[1.02] active:scale-95 transition-all">
-                                                    แสดงรหัสเข้างาน (OTP)
-                                                </button>
+                                                <button type="submit" class="w-full py-4 bg-[#00ADB5] text-[#222831] rounded-2xl font-bold shadow-lg shadow-[#00ADB5]/20 hover:scale-[1.02] active:scale-95 transition-all">แสดงรหัสเข้างาน (OTP)</button>
                                             </form>
-                                        <?php else: ?>
-                                            <div class="w-full py-4 bg-[#222831]/50 text-[#EEEEEE]/20 text-center rounded-2xl font-bold text-sm border border-[#EEEEEE]/5 cursor-default">
-                                                กิจกรรมสิ้นสุดลงแล้ว
-                                            </div>
                                         <?php endif; ?>
                                     </div>
-
                                 <?php elseif ($reg_status === 'attended'): ?>
-                                    <div class="bg-green-500/10 p-6 rounded-2xl border border-green-500/20 text-center">
-                                        <p class="text-green-400 font-bold">🎉 เข้าร่วมกิจกรรมแล้ว</p>
-                                    </div>
-
+                                    <div class="bg-green-500/10 p-6 rounded-2xl border border-green-500/20 text-center"><p class="text-green-400 font-bold">🎉 เข้าร่วมกิจกรรมแล้ว</p></div>
                                 <?php elseif ($reg_status === 'rejected'): ?>
-                                    <div class="bg-red-500/10 p-4 rounded-2xl border border-red-500/20 text-center">
-                                        <p class="text-red-400 font-bold">❌ ถูกปฏิเสธคำขอ</p>
-                                    </div>
-
+                                    <div class="bg-red-500/10 p-4 rounded-2xl border border-red-500/20 text-center"><p class="text-red-400 font-bold">❌ ถูกปฏิเสธคำขอ</p></div>
                                 <?php else: ?>
                                     <?php if (!$isPast): ?>
                                         <?php if ($is_full): ?>
-                                            <div class="w-full py-5 bg-red-500/10 text-red-400 text-center rounded-[2rem] font-bold text-lg border border-red-500/20 cursor-not-allowed">
-                                                <i class="fas fa-users-slash"></i> ผู้เข้าร่วมเต็มจำนวนแล้ว
-                                            </div>
+                                            <div class="w-full py-5 bg-red-500/10 text-red-400 text-center rounded-[2rem] font-bold text-lg border border-red-500/20 cursor-not-allowed">ผู้เข้าร่วมเต็มจำนวนแล้ว</div>
                                         <?php else: ?>
-                                            <form action="/join-event" method="post">
+                                            <form action="/join-event" method="post" id="join-event-form">
                                                 <input type="hidden" name="event_id" value="<?= $event['event_id'] ?>">
-                                                <button type="submit" class="w-full py-5 bg-[#00ADB5] text-[#222831] rounded-[2rem] font-bold text-xl hover:scale-[1.02] transition-all shadow-xl shadow-[#00ADB5]/20">
-                                                    เข้าร่วมกิจกรรม
-                                                </button>
+                                                <button type="button" id="btn-join" class="w-full py-5 bg-[#00ADB5] text-[#222831] rounded-[2rem] font-bold text-xl hover:scale-[1.02] transition-all shadow-xl shadow-[#00ADB5]/20">เข้าร่วมกิจกรรม</button>
                                             </form>
                                         <?php endif; ?>
-                                    <?php else: ?>
-                                        <div class="w-full py-5 bg-[#222831]/50 text-[#EEEEEE]/20 text-center rounded-[2rem] font-bold text-lg border border-[#EEEEEE]/5 cursor-not-allowed">
-                                            กิจกรรมจบลงแล้ว
-                                        </div>
                                     <?php endif; ?>
                                 <?php endif; ?>
-
                             <?php else: ?>
-                                <a href="/login" class="block w-full py-4 border-2 border-[#393E46] text-[#EEEEEE] text-center rounded-2xl font-bold hover:bg-[#393E46] transition-all font-sans">
-                                    เข้าสู่ระบบเพื่อเข้าร่วม
-                                </a>
+                                <a href="/login" class="block w-full py-4 border-2 border-[#393E46] text-[#EEEEEE] text-center rounded-2xl font-bold hover:bg-[#393E46] transition-all font-sans">เข้าสู่ระบบเพื่อเข้าร่วม</a>
                             <?php endif; ?>
                         </div>
                     </div>
                 </div>
             </div>
-
         <?php else: ?>
-            <div class="min-h-[50vh] flex flex-col items-center justify-center text-center">
-                <i class="fas fa-search-minus text-6xl text-[#EEEEEE]/10 mb-6"></i>
-                <h2 class="text-2xl font-bold text-[#EEEEEE]">ไม่พบข้อมูลกิจกรรม</h2>
-                <a href="/main" class="mt-4 text-[#00ADB5] hover:underline">กลับไปยังหน้ากิจกรรมทั้งหมด</a>
-            </div>
-        <?php endif; ?>
+            <?php endif; ?>
     </main>
 
     <?php include 'footer.php' ?>
-</body>
 
+    <script>
+        // รวมการตั้งค่าพื้นฐาน (ถ้าใน header ใช้ MySwal หรือชื่ออื่น ให้แก้ตามนั้นครับ)
+        const eventSwal = Swal.mixin({
+            background: '#222831',
+            color: '#EEEEEE',
+            borderRadius: '1.5rem',
+            customClass: { popup: 'rounded-[2.5rem] border border-[#EEEEEE]/10 shadow-2xl' }
+        });
+
+        // 1. ปุ่มลบกิจกรรม
+        document.querySelectorAll('.btn-confirm-delete').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const url = this.getAttribute('data-url');
+                eventSwal.fire({
+                    title: '<span class="text-[#EEEEEE]">ยืนยันการลบ?</span>',
+                    text: "ข้อมูลกิจกรรมนี้จะถูกลบถาวร!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#393E46',
+                    confirmButtonText: 'ยืนยันการลบ',
+                    cancelButtonText: 'ยกเลิก'
+                }).then((result) => { if (result.isConfirmed) window.location.href = url; });
+            });
+        });
+
+        // 2. ปุ่มยกเลิกคำขอ
+        document.querySelectorAll('.btn-confirm-cancel').forEach(btn => {
+            btn.addEventListener('click', function() {
+                eventSwal.fire({
+                    title: '<span class="text-[#EEEEEE]">ยกเลิกคำขอ?</span>',
+                    text: "คุณต้องการยกเลิกการลงทะเบียนกิจกรรมนี้ใช่หรือไม่?",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#00ADB5',
+                    cancelButtonColor: '#393E46',
+                    confirmButtonText: 'ใช่, ยกเลิกเลย',
+                    cancelButtonText: 'กลับ'
+                }).then((result) => { if (result.isConfirmed) document.getElementById('form-cancel-join').submit(); });
+            });
+        });
+
+        // 3. ปุ่มเข้าร่วมกิจกรรม (มี Confirm)
+        document.getElementById('btn-join')?.addEventListener('click', function() {
+            eventSwal.fire({
+                title: '<span class="text-[#EEEEEE]">ยืนยันการเข้าร่วม?</span>',
+                html: '<p class="text-[#EEEEEE]/60">ต้องการลงทะเบียนเข้าร่วมกิจกรรม <br><b class="text-[#00ADB5]"><?= htmlspecialchars($event['title']) ?></b> ใช่หรือไม่?</p>',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#00ADB5',
+                cancelButtonColor: '#393E46',
+                confirmButtonText: 'ใช่, เข้าร่วมเลย!',
+                cancelButtonText: 'ไว้ทีหลัง',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({ title: 'กำลังดำเนินการ...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }, background: '#222831', color: '#EEEEEE' });
+                    document.getElementById('join-event-form').submit();
+                }
+            });
+        });
+    </script>
+</body>
 </html>

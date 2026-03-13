@@ -7,7 +7,7 @@
 </head>
 
 <body class="bg-[#222831]">
-    <?php include 'header.php' ?>
+    <?php include TEMPLATES_DIR . '/header.php'; ?>
 
     <main class="min-h-[70vh] flex items-center justify-center px-4 py-12 relative overflow-hidden">
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#00ADB5]/5 rounded-full blur-[120px]"></div>
@@ -56,7 +56,7 @@
         }
     </style>
 
-    <?php include 'footer.php' ?>
+    <?php include TEMPLATES_DIR . '/footer.php' ?>
 </body>
 
 </html>

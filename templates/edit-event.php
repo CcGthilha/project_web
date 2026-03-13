@@ -30,7 +30,7 @@
             $clean_desc = $parsed_desc['clean_desc'];
             $current_max = $parsed_desc['max_limit'];
         ?>
-            <form action="/edit-event" method="POST" enctype="multipart/form-data" class="space-y-8">
+            <form id="edit-event-form" action="/edit-event" method="POST" enctype="multipart/form-data" class="space-y-8">
                 <input type="hidden" name="event_id" value="<?= $row['event_id'] ?>">
 
                 <div class="bg-[#393E46] p-8 rounded-[2.5rem] border border-[#EEEEEE]/5 shadow-xl">
@@ -39,31 +39,34 @@
                     </h3>
 
                     <?php
-                    // 🌟 ดึงรูปทั้งหมดมาหั่นแยก "รูปปก" กับ "รูปเพิ่มเติม"
                     $all_images = $data['images'] ?? [];
+                    $image_count = count($all_images); // 🌟 นับจำนวนรูปทั้งหมดที่มี
                     $cover_id = null;
                     $cover_path = null;
                     $gallery_images = [];
 
                     if (!empty($all_images)) {
-                        // ดึงรูปแรกสุดออกมาเป็นรูปปก
                         reset($all_images);
                         $cover_id = key($all_images);
-                        $cover_path = array_shift($all_images);
-                        // ที่เหลือคือรูปเพิ่มเติม
-                        $gallery_images = $all_images;
+                        $cover_path = current($all_images);
+                        $gallery_images = array_slice($all_images, 1, null, true);
                     }
                     ?>
 
                     <div class="mb-8">
                         <label class="text-xs text-[#00ADB5] uppercase font-bold tracking-widest block mb-4">รูปปกกิจกรรมปัจจุบัน</label>
                         <?php if ($cover_path): ?>
-                            <div class="w-full sm:w-1/2 md:w-1/3 relative group cursor-pointer">
-                                <img src="<?= $cover_path ?>" class="w-full aspect-video object-cover rounded-2xl border-4 border-[#00ADB5]/30 group-hover:border-red-500 transition-all shadow-lg">
+                            <div class="w-full sm:w-1/2 md:w-1/3 relative group <?= ($image_count <= 1) ? 'cursor-not-allowed' : 'cursor-pointer' ?>">
+                                <img src="<?= $cover_path ?>" class="w-full aspect-video object-cover rounded-2xl border-4 border-[#00ADB5]/30 group-hover:<?= ($image_count <= 1) ? 'border-[#00ADB5]/30' : 'border-red-500' ?> transition-all shadow-lg">
                                 <div class="absolute inset-0 bg-red-500/0 group-hover:bg-red-500/20 rounded-2xl transition-all flex items-center justify-center">
-                                    <input type="checkbox" name="delete_images[]" value="<?= $cover_id ?>" class="w-6 h-6 accent-red-500 transform scale-150 shadow-sm">
+                                    <input type="checkbox" name="delete_images[]" value="<?= $cover_id ?>" 
+                                           <?= ($image_count <= 1) ? 'disabled class="hidden"' : 'class="w-6 h-6 accent-red-500 transform scale-150 shadow-sm"' ?>>
                                 </div>
-                                <span class="absolute -top-3 -right-3 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">ลบรูปปก</span>
+                                <?php if ($image_count > 1): ?>
+                                    <span class="absolute -top-3 -right-3 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">ลบรูปปก</span>
+                                <?php else: ?>
+                                    <span class="absolute -top-3 -right-3 bg-orange-500 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-lg">ต้องมีอย่างน้อย 1 รูป</span>
+                                <?php endif; ?>
                             </div>
                             <p class="text-[10px] text-red-400 mt-2">* หากลบรูปปก รูปเพิ่มเติมถัดไปจะกลายเป็นรูปปกแทนโดยอัตโนมัติ</p>
                         <?php else: ?>
@@ -75,13 +78,16 @@
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
                         <?php if (!empty($gallery_images)): ?>
                             <?php foreach ($gallery_images as $img_id => $img_path): ?>
-                                <label class="relative group cursor-pointer">
-                                    <img src="<?= $img_path ?>" class="w-full aspect-square object-cover rounded-2xl border-2 border-transparent group-hover:border-red-500 transition-all">
+                                <div class="relative group <?= ($image_count <= 1) ? 'cursor-not-allowed' : 'cursor-pointer' ?>">
+                                    <img src="<?= $img_path ?>" class="w-full aspect-square object-cover rounded-2xl border-2 border-transparent group-hover:<?= ($image_count <= 1) ? 'border-transparent' : 'border-red-500' ?> transition-all">
                                     <div class="absolute inset-0 bg-red-500/0 group-hover:bg-red-500/20 rounded-2xl transition-all flex items-center justify-center">
-                                        <input type="checkbox" name="delete_images[]" value="<?= $img_id ?>" class="w-5 h-5 accent-red-500">
+                                        <input type="checkbox" name="delete_images[]" value="<?= $img_id ?>" 
+                                               <?= ($image_count <= 1) ? 'disabled class="hidden"' : 'class="w-5 h-5 accent-red-500"' ?>>
                                     </div>
-                                    <span class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">ลบ</span>
-                                </label>
+                                    <?php if ($image_count > 1): ?>
+                                        <span class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">ลบ</span>
+                                    <?php endif; ?>
+                                </div>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <p class="text-[#EEEEEE]/20 text-sm italic col-span-full">ไม่มีรูปเพิ่มเติม</p>
@@ -151,7 +157,7 @@
                 </div>
 
                 <div class="pt-6">
-                    <button type="submit"
+                    <button type="button" id="btn-submit-edit"
                         class="w-full py-5 bg-[#00ADB5] text-[#222831] rounded-[2rem] font-bold text-xl hover:shadow-[0_15px_35px_rgba(0,173,181,0.3)] hover:scale-[1.01] active:scale-95 transition-all flex items-center justify-center gap-3">
                         <i class="fas fa-save"></i> บันทึกข้อมูลที่แก้ไข
                     </button>
@@ -172,6 +178,55 @@
     </main>
 
     <?php include 'footer.php' ?>
+    <script>
+        document.getElementById('btn-submit-edit')?.addEventListener('click', function() {
+            const form = document.getElementById('edit-event-form');
+
+            const title = document.getElementById('title').value.trim();
+            const startDate = new Date(document.getElementById('start_date').value);
+            const endDate = new Date(document.getElementById('end_date').value);
+
+            if (endDate <= startDate) {
+                MySwal.fire({
+                    icon: 'error',
+                    title: 'วันเวลาไม่ถูกต้อง',
+                    text: 'วันเวลาสิ้นสุดกิจกรรม จะต้องอยู่หลังเวลาเริ่มงานนะครับ',
+                });
+                return;
+            }
+
+            MySwal.fire({
+                title: '<span class="text-[#EEEEEE]">ยืนยันการแก้ไขข้อมูล?</span>',
+                html: `<p class="text-[#EEEEEE]/60">คุณต้องการบันทึกการเปลี่ยนแปลงของกิจกรรม <br><b class="text-[#00ADB5]">${title}</b> <br>ใช่หรือไม่?</p>`,
+                icon: 'question',
+                iconColor: '#00ADB5',
+                showCancelButton: true,
+                confirmButtonColor: '#00ADB5',
+                cancelButtonColor: '#393E46',
+                confirmButtonText: 'ใช่, บันทึกเลย',
+                cancelButtonText: 'ตรวจสอบอีกครั้ง',
+                reverseButtons: true,
+                customClass: {
+                    popup: 'rounded-[2.5rem] border border-[#EEEEEE]/10 shadow-2xl',
+                    confirmButton: 'px-6 py-3 rounded-xl font-bold',
+                    cancelButton: 'px-6 py-3 rounded-xl font-bold'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'กำลังบันทึกข้อมูล...',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        },
+                        background: '#222831',
+                        color: '#EEEEEE'
+                    });
+                    form.submit();
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

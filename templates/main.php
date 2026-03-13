@@ -1,8 +1,13 @@
+<?php
+// 1. ตั้งค่า Timezone ให้ตรงกับเวลาไทย (ป้องกัน Live Now ไม่ขึ้น)
+date_default_timezone_set('Asia/Bangkok');
+?>
 <!DOCTYPE html>
 <html lang="th">
 
 <head>
   <title>ค้นหากิจกรรม | Event for you</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     .scrollbar-hide::-webkit-scrollbar {
       display: none;
@@ -81,19 +86,29 @@
       $res_upcoming = $data['upcoming'] ?? null;
       if ($res_upcoming && $res_upcoming->num_rows > 0):
         while ($row = $res_upcoming->fetch_assoc()):
-          $now = new DateTime();
+          // 2. แก้ไขส่วนเวลาตรงนี้
+          $now = new DateTime(); // เวลาปัจจุบัน (อิงตาม timezone ที่เซตไว้)
           $start = new DateTime($row['start_date']);
           $end = new DateTime($row['end_date']);
-          $is_live = ($start <= $now && $end >= $now);
-          $is_past = ($end < $now);
 
-          // 🌟 โค้ดใหม่: ดึงตัวเลขรับสมัครออกจาก Description ของการ์ดใบนี้
+          // Logic: ถ้าเวลาปัจจุบันอยู่ระหว่างเริ่มและจบ ให้เป็น Live
+          $is_live = ($now >= $start && $now <= $end);
+          $is_past = ($now > $end);
+
+          var_dump([
+            'now' => $now->format('Y-m-d H:i:s'),
+            'start' => $start->format('Y-m-d H:i:s'),
+            'end' => $end->format('Y-m-d H:i:s'),
+            'is_live' => ($now >= $start && $now <= $end)
+          ]);
+
+          // 🌟 โค้ดเดิมของคุณ: ดึงตัวเลขรับสมัครออกจาก Description
           $max_limit_main = 0;
           if (preg_match('/\[MAX:(\d+)\]$/', $row['description'], $matches)) {
             $max_limit_main = (int)$matches[1];
           }
 
-          // 🌟 โค้ดใหม่: นับคนและเช็คเต็ม 🌟
+          // 🌟 โค้ดเดิมของคุณ: นับคนและเช็คเต็ม
           $current_joined_main = getParticipantCount($row['event_id']);
           $is_full_main = ($max_limit_main > 0 && $current_joined_main >= $max_limit_main);
       ?>
@@ -167,9 +182,9 @@
                   <?php else: ?>
                     <form action="/join-event" method="post">
                       <input type="hidden" name="event_id" value="<?= $row['event_id'] ?>">
-                      <button type="submit" onclick="return confirm('คุณแน่ใจหรือไม่ว่าต้องการเข้าร่วมกิจกรรมนี้?');"
-                        class="w-full py-3 bg-[#00ADB5] text-[#222831] rounded-xl font-bold text-xs hover:shadow-lg shadow-[#00ADB5]/20 transition-all">
-                        เข้าร่วมกิจกรรม
+                      <button type="button"
+                        class="btn-join-event w-full py-3 bg-[#00ADB5] text-[#222831] rounded-xl font-bold text-xs hover:shadow-lg shadow-[#00ADB5]/20 transition-all"
+                        data-title="<?= htmlspecialchars($row['title']) ?>"> เข้าร่วมกิจกรรม
                       </button>
                     </form>
                   <?php endif; ?>
@@ -200,6 +215,49 @@
       const filter = document.getElementById('date-filter');
       filter.classList.toggle('hidden');
     }
+
+    // จัดการการแจ้งเตือนยืนยันก่อนเข้าร่วม
+    document.querySelectorAll('.btn-join-event').forEach(button => {
+      button.addEventListener('click', function() {
+        const form = this.closest('form');
+        const eventTitle = this.getAttribute('data-title');
+
+        Swal.fire({
+          title: '<span class="text-[#EEEEEE]">ยืนยันการเข้าร่วม?</span>',
+          html: `<p class="text-[#EEEEEE]/60">คุณต้องการลงทะเบียนเข้าร่วมกิจกรรม <br><b class="text-[#00ADB5]">${eventTitle}</b> ใช่หรือไม่?</p>`,
+          icon: 'question',
+          iconColor: '#00ADB5',
+          showCancelButton: true,
+          confirmButtonColor: '#00ADB5',
+          cancelButtonColor: '#393E46',
+          confirmButtonText: 'ใช่, ฉันต้องการเข้าร่วม!',
+          cancelButtonText: 'ยกเลิก',
+          background: '#222831',
+          color: '#EEEEEE',
+          borderRadius: '1.5rem',
+          reverseButtons: true,
+          customClass: {
+            popup: 'rounded-[2.5rem] border border-[#EEEEEE]/10 shadow-2xl',
+            confirmButton: 'px-6 py-3 rounded-xl font-bold',
+            cancelButton: 'px-6 py-3 rounded-xl font-bold'
+          }
+        }).then((result) => {
+          if (result.isConfirmed) {
+            Swal.fire({
+              title: 'กำลังดำเนินการ...',
+              allowOutsideClick: false,
+              didOpen: () => {
+                Swal.showLoading();
+              },
+              background: '#222831',
+              color: '#EEEEEE'
+            });
+
+            form.submit();
+          }
+        });
+      });
+    });
   </script>
 </body>
 

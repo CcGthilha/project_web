@@ -4,9 +4,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
     $event_id = (int)$_POST['event_id'];
 
-    // ตรวจสอบก่อนว่าเคยเข้าร่วมไปแล้วหรือยัง
+    // กำหนด URL สำหรับ Redirect กลับ (ถ้าไม่มี referer ให้ไปหน้า main)
+    $return_url = $_SERVER['HTTP_REFERER'] ?? '/main';
+
+    // 1. ตรวจสอบว่าเคยเข้าร่วมหรือยัง
     if (isAlreadyJoined($user_id, $event_id)) {
-        echo "<script>alert('คุณได้ส่งคำขอเข้าร่วมกิจกรรมนี้ไปแล้ว ไม่สามารถขอซ้ำได้'); window.history.back();</script>";
+        $_SESSION['msg_error'] = 'คุณได้ส่งคำขอเข้าร่วมกิจกรรมนี้ไปแล้ว';
+        header("Location: $return_url");
         exit();
     }
 
@@ -24,31 +28,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['user_id'])) {
 
         if ($max_limit_check > 0) {
             $current_joined_check = getParticipantCount($event_id); 
-            
             if ($current_joined_check >= $max_limit_check) {
-                // 🛑 คนเต็มแล้ว! เตือนแล้วเตะกลับหน้าเดิม 🛑
-                echo "<script>
-                        alert('❌ ขออภัยครับ กิจกรรมนี้มีผู้เข้าร่วมเต็มจำนวนแล้ว!'); 
-                        window.history.back();
-                      </script>";
-                exit(); // 🛑 สั่งหยุดการทำงานตรงนี้เลย โค้ดด้านล่างจะไม่ถูกรัน
+                $_SESSION['msg_error'] = 'ขออภัยครับ กิจกรรมนี้มีผู้เข้าร่วมเต็มจำนวนแล้ว!';
+                header("Location: $return_url");
+                exit();
             }
         }
     }
 
-    // ถ้ายังไม่เคยเข้าร่วม ถึงจะยอมให้ Insert ข้อมูล
+    // 2. ลองทำการ Insert ข้อมูล
     if (joinEvent($user_id, $event_id)) {
-        // 🌟 ตัวช่วยสำคัญ: หาว่าผู้ใช้กดปุ่มมาจากหน้าเว็บไหน (URL อะไร)
-        if (isset($_SERVER['HTTP_REFERER'])) {
-            $return_url = $_SERVER['HTTP_REFERER'];
-        } else {
-            $return_url = '/main?id=' . $event_id;
-        }
-        echo "<script>alert('เข้าร่วมกิจกรรมสำเร็จ!'); window.location.href='$return_url';</script>";
+        $_SESSION['msg_success'] = 'ส่งคำขอเข้าร่วมกิจกรรมสำเร็จ!';
     } else {
-        echo "<script>alert('เกิดข้อผิดพลาดในการส่งคำขอ'); window.history.back();</script>";
+        $_SESSION['msg_error'] = 'เกิดข้อผิดพลาดในการส่งคำขอ';
     }
+    
+    header("Location: $return_url");
     exit();
+
 } else {
     header('Location: /login');
     exit();

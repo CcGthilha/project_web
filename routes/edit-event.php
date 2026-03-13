@@ -14,7 +14,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
 
     if (!$event_data || $event_data['user_id'] != $_SESSION['user_id']) {
-        echo "<script>alert('คุณไม่มีสิทธิ์เข้าถึงกิจกรรมนี้'); window.location.href='/main';</script>";
+        // ใช้ SESSION สำหรับแจ้งเตือนข้อผิดพลาด
+        $_SESSION['msg_error'] = 'คุณไม่มีสิทธิ์เข้าถึงกิจกรรมนี้';
+        header('Location: /main');
         exit();
     }
 
@@ -23,11 +25,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         'event' => $event_data,
         'images' => $images
     ]);
-
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $event_id = $_POST['event_id'];
 
-    // 🌟 1. จัดการเรื่องจำนวนผู้เข้าร่วมสูงสุด (ดักจับคนปรับลดเกินเหตุ) 🌟
+    // 🌟 1. จัดการเรื่องจำนวนผู้เข้าร่วมสูงสุด (คงเดิม)
     $max_participants = isset($_POST['max_participants']) ? (int)$_POST['max_participants'] : 0;
     if ($max_participants > 99999) {
         $max_participants = 99999;
@@ -36,29 +37,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $current_joined = getParticipantCount($event_id);
 
     if ($max_participants > 0 && $max_participants < $current_joined) {
-        echo "<script>
-                alert('❌ ไม่สามารถแก้ไขได้! จำนวนรับสูงสุดต้องไม่น้อยกว่าผู้เข้าร่วมปัจจุบัน ($current_joined คน)'); 
-                window.history.back();
-              </script>";
+        $_SESSION['msg_error'] = "ไม่สามารถแก้ไขได้! จำนวนรับสูงสุดต้องไม่น้อยกว่าผู้เข้าร่วมปัจจุบัน ($current_joined คน)";
+        header("Location: /edit-event?id=$event_id");
         exit();
     }
 
-
     $final_description = trim($_POST['description']) . " [MAX:" . $max_participants . "]";
 
-    // 1. ลบรูปที่ผู้ใช้ติ๊กเลือก
+    // 🌟 2. แก้ไขส่วนการลบรูปภาพ: เพิ่มการเช็คจำนวนรูปขั้นต่ำ
     if (isset($_POST['delete_images'])) {
-        foreach ($_POST['delete_images'] as $image_id) {
-            deleteImageById((int)$image_id);
+        $delete_ids = $_POST['delete_images'];
+
+        // ดึงจำนวนรูปภาพปัจจุบันทั้งหมดของกิจกรรมนี้จากฐานข้อมูล
+        $current_images_res = getEventByEventId($event_id);
+        $total_current_images = $current_images_res->num_rows;
+
+        // ตรวจสอบว่าถ้าลบตามที่เลือกแล้ว จะยังเหลืออย่างน้อย 1 รูปหรือไม่
+        if (($total_current_images - count($delete_ids)) >= 1) {
+            foreach ($delete_ids as $image_id) {
+                deleteImageById((int)$image_id); // เรียกฟังก์ชันลบรูป
+            }
+        } else {
+            // หากผู้ใช้พยายามลบจนไม่เหลือรูปเลย ให้เก็บข้อความแจ้งเตือนความผิดพลาด
+            $_SESSION['msg_error'] = 'ไม่สามารถลบได้ กิจกรรมต้องมีรูปภาพแสดงอย่างน้อย 1 รูป';
+            header("Location: /edit-event?id=$event_id");
+            exit();
         }
     }
 
-    // 2. อัปโหลดรูปใหม่เพิ่มเติม
+    // 3. อัปโหลดรูปใหม่เพิ่มเติม (คงเดิม)
     if (isset($_FILES['new_images']) && !empty($_FILES['new_images']['name'][0])) {
-        // 🌟 แก้บรรทัดนี้: เพิ่ม __DIR__ ให้มันหาโฟลเดอร์ public เจอชัวร์ๆ
-        $upload_dir = __DIR__ . '/../public/uploads/'; 
-        
-        // เช็คว่ามีโฟลเดอร์ไหม ถ้าไม่มีให้สร้าง (กันเหนียว)
+        $upload_dir = __DIR__ . '/../public/uploads/';
         if (!is_dir($upload_dir)) {
             mkdir($upload_dir, 0777, true);
         }
@@ -67,15 +76,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             if ($_FILES['new_images']['error'][$key] === UPLOAD_ERR_OK) {
                 $file_name = time() . '_edit_' . $key . '_' . basename($_FILES['new_images']['name'][$key]);
                 if (move_uploaded_file($tmp_name, $upload_dir . $file_name)) {
-                    // 🌟 แก้บรรทัดนี้: เติม /public นำหน้า path ที่จะเซฟลงฐานข้อมูล
                     addEventImage($event_id, '/public/uploads/' . $file_name);
                 }
             }
         }
     }
 
-    // 3. อัปเดตข้อมูลตัวอักษร
-    updateEvent($event_id, $_POST['title'], $final_description, $_POST['location'], $_POST['start_date'], $_POST['end_date']);
+    // 4. อัปเดตข้อมูลตัวอักษร (คงเดิม)
+    $update_res = updateEvent($event_id, $_POST['title'], $final_description, $_POST['location'], $_POST['start_date'], $_POST['end_date']);
+
+    if ($update_res) {
+        $_SESSION['msg_success'] = 'แก้ไขข้อมูลกิจกรรมเรียบร้อยแล้ว!';
+    } else {
+        $_SESSION['msg_error'] = 'เกิดข้อผิดพลาดในการบันทึกข้อมูล';
+    }
+
     header('Location: /events');
     exit();
 }

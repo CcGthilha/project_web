@@ -32,7 +32,7 @@
                         </div>
                     </div>
 
-                    <form action="chpw?id=<?= $row->user_id ?>" method="post" class="space-y-6">
+                    <form id="chpw-form" action="chpw?id=<?= $row->user_id ?>" method="post" class="space-y-6">
                         <div class="space-y-2">
                             <label for="password" class="text-xs text-[#EEEEEE]/50 ml-2">รหัสผ่านใหม่</label>
                             <div class="relative">
@@ -54,11 +54,12 @@
                             <p id="password-error" class="text-[11px] mt-1 ml-2 min-h-[1rem] transition-all"></p>
                         </div>
 
-                        <button type="submit"
-                            class="w-full py-4 bg-[#00ADB5] text-[#222831] rounded-2xl font-bold text-lg hover:shadow-[0_10px_25px_rgba(0,173,181,0.3)] hover:scale-[1.02] active:scale-95 transition-all mt-4"
-                            onclick="return confirm('ยืนยันการเปลี่ยนรหัสผ่าน?')">
+
+                        <button type="button" id="btn-save-pw" disabled
+                            class="w-full py-4 bg-[#393E46] text-[#EEEEEE]/20 border border-[#EEEEEE]/5 rounded-2xl font-bold text-lg transition-all mt-4 cursor-not-allowed">
                             บันทึกรหัสผ่านใหม่
                         </button>
+                    </form>
                     </form>
                 <?php endif; ?>
 
@@ -75,27 +76,81 @@
         const password = document.getElementById('password');
         const confirmPassword = document.getElementById('confirm_password');
         const errorText = document.getElementById('password-error');
+        const btnSave = document.getElementById('btn-save-pw');
+        const chpwForm = document.getElementById('chpw-form');
 
         function checkPassword() {
-            if (confirmPassword.value === "") {
+            const pw = password.value;
+            const cpw = confirmPassword.value;
+
+            // ถ้ายังไม่ได้กรอกช่องยืนยัน
+            if (cpw === "") {
                 errorText.textContent = "";
                 confirmPassword.style.borderColor = "#393E46";
+                updateButton(false);
                 return;
             }
 
-            if (password.value !== confirmPassword.value) {
+            // เช็คความตรงกัน
+            if (pw !== cpw) {
                 errorText.textContent = "✘ รหัสผ่านไม่ตรงกัน";
-                errorText.style.color = "#ff6b6b"; // Red
+                errorText.style.color = "#ff6b6b";
                 confirmPassword.style.borderColor = "#ff6b6b";
+                updateButton(false);
+            } else if (pw.length < 1) { // กรณีว่างทั้งคู่
+                updateButton(false);
             } else {
                 errorText.textContent = "✓ รหัสผ่านตรงกัน";
-                errorText.style.color = "#00ADB5"; // Teal
+                errorText.style.color = "#00ADB5";
                 confirmPassword.style.borderColor = "#00ADB5";
+                updateButton(true);
+            }
+        }
+
+        function updateButton(isValid) {
+            if (isValid) {
+                btnSave.disabled = false;
+                btnSave.classList.remove('bg-[#393E46]', 'text-[#EEEEEE]/20', 'border-[#EEEEEE]/5', 'cursor-not-allowed');
+                btnSave.classList.add('bg-[#00ADB5]', 'text-[#222831]', 'hover:shadow-[0_10px_25px_rgba(0,173,181,0.3)]', 'hover:scale-[1.02]', 'active:scale-95');
+            } else {
+                btnSave.disabled = true;
+                btnSave.classList.add('bg-[#393E46]', 'text-[#EEEEEE]/20', 'border-[#EEEEEE]/5', 'cursor-not-allowed');
+                btnSave.classList.remove('bg-[#00ADB5]', 'text-[#222831]', 'hover:shadow-[0_10px_25px_rgba(0,173,181,0.3)]', 'hover:scale-[1.02]', 'active:scale-95');
             }
         }
 
         password.addEventListener("input", checkPassword);
         confirmPassword.addEventListener("input", checkPassword);
+
+        // ระบบยืนยันด้วย SweetAlert2 (เรียกใช้ MySwal จาก header)
+        btnSave.addEventListener('click', function() {
+            MySwal.fire({
+                title: '<span class="text-[#EEEEEE]">ยืนยันการเปลี่ยนรหัสผ่าน?</span>',
+                text: "หลังจากเปลี่ยนแล้ว คุณจะต้องใช้รหัสผ่านใหม่ในการเข้าสู่ระบบครั้งถัดไป",
+                icon: 'question',
+                iconColor: '#00ADB5',
+                showCancelButton: true,
+                confirmButtonColor: '#00ADB5',
+                cancelButtonColor: '#393E46',
+                confirmButtonText: 'ใช่, เปลี่ยนรหัสผ่าน',
+                cancelButtonText: 'ยกเลิก',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // แสดง Loading
+                    Swal.fire({
+                        title: 'กำลังบันทึก...',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        },
+                        background: '#222831',
+                        color: '#EEEEEE'
+                    });
+                    chpwForm.submit();
+                }
+            });
+        });
     </script>
 </body>
 
