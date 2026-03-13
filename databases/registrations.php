@@ -220,14 +220,14 @@ function markAsAttended(int $registrations_id)
 }
 
 
-function getParticipantsByEventId(int $event_id): mysqli_result|bool
+
+function getApprovedParticipants(int $event_id): mysqli_result|bool
 {
     global $conn;
-    // เพิ่มการดึงข้อมูล gender, birth_date, occupation, province จากตาราง users
     $sql = "SELECT r.*, u.name, u.email, u.gender, u.birth_date, u.occupation, u.province 
             FROM registrations r 
             JOIN users u ON r.user_id = u.user_id 
-            WHERE r.event_id = ?";
+            WHERE r.event_id = ? AND r.status IN ('approved', 'attended')";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('i', $event_id);
     $stmt->execute();
