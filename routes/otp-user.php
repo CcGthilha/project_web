@@ -16,8 +16,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $user_id = $_SESSION['user_id'];
 
 if (!isUserApprovedForEvent($user_id, $event_id)) {
-    echo "<script>alert('คุณไม่มีสิทธิ์เข้าดูรหัสของงานนี้ หรือยังไม่ได้รับการอนุมัติ'); 
-          window.location.href='/';</script>";
+    $_SESSION['msg_error'] = 'คุณไม่มีสิทธิ์เข้าดูรหัสของงานนี้ หรือยังไม่ได้รับการอนุมัติ';
+    header('Location: /main');
     exit();
 }
 $current_otp = generateStatelessOTP($user_id, $event_id);
