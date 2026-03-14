@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <html lang="th">
+<!-- templates/event-detail.php-->
+
 <head>
     <title><?= htmlspecialchars($data['title']) ?> | Event for you</title>
 </head>
@@ -19,13 +21,11 @@
         $endDate = new DateTime($event['end_date']);
         $isPast = ($endDate < $now);
 
-        $raw_desc = $event['description'];
-        $clean_desc = $raw_desc;
-
-        if (preg_match('/\[MAX:(\d+)\]/i', $raw_desc, $matches)) {
-            $max_limit = (int)$matches[1];
-            $clean_desc = str_replace($matches[0], '', $raw_desc);
-        }
+        // 🌟 เรียกใช้ฟังก์ชันสกัดข้อความที่เราเคยสร้างไว้ (โค้ดสั้นลง และเป็นระเบียบ)
+        $parsed_data = parseEventDescription($event['description']);
+        
+        $max_limit = $parsed_data['max_limit'];
+        $clean_desc = $parsed_data['clean_desc'];
 
         $current_joined = getParticipantCount($event['event_id']);
 
@@ -141,7 +141,9 @@
                                     </div>
                                 <?php elseif ($reg_status === 'approved'): ?>
                                     <div class="space-y-3">
-                                        <div class="bg-[#00ADB5]/10 p-4 rounded-2xl border border-[#00ADB5]/20 text-center"><p class="text-[#00ADB5] font-bold">✅ อนุมัติแล้ว!</p></div>
+                                        <div class="bg-[#00ADB5]/10 p-4 rounded-2xl border border-[#00ADB5]/20 text-center">
+                                            <p class="text-[#00ADB5] font-bold">✅ อนุมัติแล้ว!</p>
+                                        </div>
                                         <?php if (!$isPast): ?>
                                             <form action="/otp-user" method="post">
                                                 <input type="hidden" name="event_id" value="<?= $event['event_id'] ?>">
@@ -150,9 +152,13 @@
                                         <?php endif; ?>
                                     </div>
                                 <?php elseif ($reg_status === 'attended'): ?>
-                                    <div class="bg-green-500/10 p-6 rounded-2xl border border-green-500/20 text-center"><p class="text-green-400 font-bold">🎉 เข้าร่วมกิจกรรมแล้ว</p></div>
+                                    <div class="bg-green-500/10 p-6 rounded-2xl border border-green-500/20 text-center">
+                                        <p class="text-green-400 font-bold">🎉 เข้าร่วมกิจกรรมแล้ว</p>
+                                    </div>
                                 <?php elseif ($reg_status === 'rejected'): ?>
-                                    <div class="bg-red-500/10 p-4 rounded-2xl border border-red-500/20 text-center"><p class="text-red-400 font-bold">❌ ถูกปฏิเสธคำขอ</p></div>
+                                    <div class="bg-red-500/10 p-4 rounded-2xl border border-red-500/20 text-center">
+                                        <p class="text-red-400 font-bold">❌ ถูกปฏิเสธคำขอ</p>
+                                    </div>
                                 <?php else: ?>
                                     <?php if (!$isPast): ?>
                                         <?php if ($is_full): ?>
@@ -173,7 +179,7 @@
                 </div>
             </div>
         <?php else: ?>
-            <?php endif; ?>
+        <?php endif; ?>
     </main>
 
     <?php include 'footer.php' ?>
@@ -184,7 +190,9 @@
             background: '#222831',
             color: '#EEEEEE',
             borderRadius: '1.5rem',
-            customClass: { popup: 'rounded-[2.5rem] border border-[#EEEEEE]/10 shadow-2xl' }
+            customClass: {
+                popup: 'rounded-[2.5rem] border border-[#EEEEEE]/10 shadow-2xl'
+            }
         });
 
         // 1. ปุ่มลบกิจกรรม
@@ -201,7 +209,9 @@
                     cancelButtonColor: '#393E46',
                     confirmButtonText: 'ยืนยันการลบ',
                     cancelButtonText: 'ยกเลิก'
-                }).then((result) => { if (result.isConfirmed) window.location.href = url; });
+                }).then((result) => {
+                    if (result.isConfirmed) window.location.href = url;
+                });
             });
         });
 
@@ -217,7 +227,9 @@
                     cancelButtonColor: '#393E46',
                     confirmButtonText: 'ใช่, ยกเลิกเลย',
                     cancelButtonText: 'กลับ'
-                }).then((result) => { if (result.isConfirmed) document.getElementById('form-cancel-join').submit(); });
+                }).then((result) => {
+                    if (result.isConfirmed) document.getElementById('form-cancel-join').submit();
+                });
             });
         });
 
@@ -235,11 +247,20 @@
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    Swal.fire({ title: 'กำลังดำเนินการ...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }, background: '#222831', color: '#EEEEEE' });
+                    Swal.fire({
+                        title: 'กำลังดำเนินการ...',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        },
+                        background: '#222831',
+                        color: '#EEEEEE'
+                    });
                     document.getElementById('join-event-form').submit();
                 }
             });
         });
     </script>
 </body>
+
 </html>

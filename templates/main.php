@@ -95,20 +95,23 @@ date_default_timezone_set('Asia/Bangkok');
           $is_live = ($now >= $start && $now <= $end);
           $is_past = ($now > $end);
 
-          var_dump([
+          /*var_dump([
             'now' => $now->format('Y-m-d H:i:s'),
             'start' => $start->format('Y-m-d H:i:s'),
             'end' => $end->format('Y-m-d H:i:s'),
             'is_live' => ($now >= $start && $now <= $end)
-          ]);
+          ]);*/
 
           // 🌟 โค้ดเดิมของคุณ: ดึงตัวเลขรับสมัครออกจาก Description
-          $max_limit_main = 0;
-          if (preg_match('/\[MAX:(\d+)\]$/', $row['description'], $matches)) {
-            $max_limit_main = (int)$matches[1];
-          }
+          // 1. เรียกใช้โรงงานสกัดข้อมูล (ฟังก์ชันชุดที่ 1)
+          
+          $parsed_data = parseEventDescription($row['description']);
 
-          // 🌟 โค้ดเดิมของคุณ: นับคนและเช็คเต็ม
+          // 2. เอาข้อมูลที่สกัดแล้วมาใช้ต่อได้เลย
+          $max_limit_main = $parsed_data['max_limit'];
+          $clean_description = $parsed_data['clean_desc']; // เอาตัวนี้ไปโชว์หน้าเว็บนะ โค้ดลับจะได้ไม่โผล่!
+
+          // 3. เช็คสถานะคนเต็ม (โค้ดเดิมของคุณ)
           $current_joined_main = getParticipantCount($row['event_id']);
           $is_full_main = ($max_limit_main > 0 && $current_joined_main >= $max_limit_main);
       ?>
