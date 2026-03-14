@@ -15,8 +15,7 @@ while ($p = $data['participants']->fetch_assoc()) {
     $g = strtolower(trim($p['gender']));
     if ($g == 'male' || $g == 'ชาย') {
         $stats['gender']['ชาย']++;
-    } elseif ($g == 'female' || $g == 'หญิง' || $g == 'famemale' || $g == 'famale') {
-
+    } elseif ($g == 'female' || $g == 'หญิง') {
         $stats['gender']['หญิง']++;
     } else {
         $stats['gender']['อื่นๆ']++;

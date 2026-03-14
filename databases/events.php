@@ -97,7 +97,7 @@ function deleteEvent(int $event_id): bool
     $res_img = $stmt_get_img->get_result();
 
     if ($row_img = $res_img->fetch_assoc()) {
-        $file_path = __DIR__ . '/..' . $row_img['image_path'];
+        $file_path = __DIR__ . '/../..' . $row_img['image_path'];
         if (file_exists($file_path) && !empty($row_img['image_path'])) {
             unlink($file_path);
         }
@@ -149,7 +149,7 @@ function deleteImageById(int $image_id): bool
     $res = $stmt->get_result();
     if ($row = $res->fetch_assoc()) {
         // แก้ตรงนี้ จาก '../public' เป็น __DIR__ . '/..'
-        $file_path = __DIR__ . '/..' . $row['image_path'];
+        $file_path = __DIR__ . '/../..' . $row['image_path'];
         if (file_exists($file_path)) unlink($file_path);
     }
 
@@ -209,5 +209,3 @@ function parseEventDescription($raw_desc)
         'max_limit' => $max_limit
     ];
 }
-
-

@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     // 3. อัปโหลดรูปใหม่เพิ่มเติม (คงเดิม)
     if (isset($_FILES['new_images']) && !empty($_FILES['new_images']['name'][0])) {
-        $upload_dir = __DIR__ . '/../public/uploads/';
+        $upload_dir = __DIR__ . '/../uploads/';
         if (!is_dir($upload_dir)) {
             mkdir($upload_dir, 0777, true);
         }
@@ -76,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             if ($_FILES['new_images']['error'][$key] === UPLOAD_ERR_OK) {
                 $file_name = time() . '_edit_' . $key . '_' . basename($_FILES['new_images']['name'][$key]);
                 if (move_uploaded_file($tmp_name, $upload_dir . $file_name)) {
-                    addEventImage($event_id, '/public/uploads/' . $file_name);
+                    addEventImage($event_id, '/uploads/' . $file_name);
                 }
             }
         }

@@ -16,8 +16,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $raw_description = $_POST['description'];
     $location = $_POST['location'];
     $start_date = $_POST['start_date'];
-    $end_date = $_POST['end_date']; 
-    
+    $end_date = $_POST['end_date'];
+
     $max_participants = isset($_POST['max_participants']) ? (int)$_POST['max_participants'] : 0;
 
     if ($max_participants > 99999) {
@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $new_event_id = createEvent($user_id, $title, $final_description, $location, $start_date, $end_date);
 
     if ($new_event_id) {
-        $upload_dir = __DIR__ . '/../public/uploads/';
+        $upload_dir = __DIR__ . '/../uploads/';
         if (!is_dir($upload_dir)) {
             mkdir($upload_dir, 0777, true);
         }
@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         if (isset($_FILES['cover_image']) && $_FILES['cover_image']['error'] === UPLOAD_ERR_OK) {
             $file_name = time() . '_cover_' . basename($_FILES['cover_image']['name']);
             if (move_uploaded_file($_FILES['cover_image']['tmp_name'], $upload_dir . $file_name)) {
-                addEventImage($new_event_id, '/public/uploads/' . $file_name);
+                addEventImage($new_event_id, '/uploads/' . $file_name);
             }
         }
 
@@ -48,13 +48,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 if ($_FILES['gallery_images']['error'][$key] === UPLOAD_ERR_OK) {
                     $file_name = time() . '_gallery_' . $key . '_' . basename($_FILES['gallery_images']['name'][$key]);
                     if (move_uploaded_file($tmp_name, $upload_dir . $file_name)) {
-                        addEventImage($new_event_id, '/public/uploads/' . $file_name);
+                        addEventImage($new_event_id, '/uploads/' . $file_name);
                     }
                 }
             }
         }
 
-        
+
         header('Location: /main');
         exit();
     } else {
