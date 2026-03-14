@@ -12,12 +12,11 @@ $all_data = [];
 while ($p = $data['participants']->fetch_assoc()) {
     $stats['total']++;
 
-    // --- Logic จัดการเพศให้เมคเซ้นส์ ---
     $g = strtolower(trim($p['gender']));
     if ($g == 'male' || $g == 'ชาย') {
         $stats['gender']['ชาย']++;
     } elseif ($g == 'female' || $g == 'หญิง' || $g == 'famemale' || $g == 'famale') {
-        // ดักจับคำที่สะกดผิดจาก User เช่น famemale ให้เป็น "หญิง"
+
         $stats['gender']['หญิง']++;
     } else {
         $stats['gender']['อื่นๆ']++;
@@ -74,7 +73,7 @@ arsort($stats['provinces']);
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
             <div class="bg-gradient-to-br from-[#393E46] to-[#222831] p-8 rounded-[2.5rem] border border-[#00ADB5]/30 shadow-2xl relative overflow-hidden">
                 <i class="fas fa-users absolute -right-4 -bottom-4 text-7xl text-[#00ADB5]/5 rotate-12"></i>
-                <p class="text-[10px] text-[#00ADB5] uppercase font-bold tracking-[0.2em] mb-2">ผู้สมัครทั้งหมด</p>
+                <p class="text-[10px] text-[#00ADB5] uppercase font-bold tracking-[0.2em] mb-2">ผู้เข้าร่วมกิจกรรมทั้งหมด</p>
                 <h3 class="text-5xl font-extrabold text-[#EEEEEE]"><?= number_format($stats['total']) ?> <span class="text-lg font-light text-[#EEEEEE]/40">คน</span></h3>
             </div>
         </div>
