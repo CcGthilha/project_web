@@ -210,16 +210,4 @@ function parseEventDescription($raw_desc)
     ];
 }
 
-function getParticipantsByEventId(int $event_id): mysqli_result|bool
-{
-    global $conn;
-    // ดึงข้อมูลการลงทะเบียนทั้งหมด (ทุกสถานะ) พร้อมรายละเอียดของผู้ใช้
-    $sql = "SELECT r.*, u.name, u.email, u.gender, u.birth_date, u.occupation, u.province 
-            FROM registrations r 
-            JOIN users u ON r.user_id = u.user_id 
-            WHERE r.event_id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param('i', $event_id);
-    $stmt->execute();
-    return $stmt->get_result();
-}
+
