@@ -21,10 +21,11 @@ if (!isUserApprovedForEvent($user_id, $event_id)) {
     exit();
 }
 $current_otp = generateStatelessOTP($user_id, $event_id);
+$seconds_remaining = 1800 - (time() % 1800);
 
 renderView('otp-user', [
     'title' => 'รหัสเข้างานของคุณ',
     'otp' => $current_otp,
-    'event_id' => $event_id
+    'event_id' => $event_id,
+    'seconds_remaining' => $seconds_remaining
 ]);
-?>

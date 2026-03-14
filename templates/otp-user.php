@@ -36,7 +36,7 @@
                 <div class="mt-10 p-4 bg-red-500/5 rounded-2xl border border-red-500/10">
                     <p class="text-red-400 text-xs leading-relaxed">
                         <i class="fas fa-exclamation-triangle mr-1"></i>
-                        รหัสนี้มีอายุการใช้งาน <strong>30 นาที</strong> <br>
+                        รหัสนี้จะหมดอายุใน <strong id="countdown"></strong> <br>
                         กรุณาอย่าเปิดเผยรหัสนี้แก่บุคคลอื่นที่ไม่เกี่ยวข้อง
                     </p>
                 </div>
@@ -51,6 +51,25 @@
     </main>
 
     <?php include 'footer.php'; ?>
+    <script>
+        let seconds = <?= $data['seconds_remaining'] ?>;
+
+        function updateCountdown() {
+            const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+            const s = String(seconds % 60).padStart(2, '0');
+            document.getElementById('countdown').textContent = m + ':' + s;
+
+            if (seconds <= 0) {
+                // OTP หมดอายุ reload หน้าเพื่อดึง OTP ใหม่
+                location.reload();
+            } else {
+                seconds--;
+                setTimeout(updateCountdown, 1000);
+            }
+        }
+
+        updateCountdown();
+    </script>
 </body>
 
 </html>
