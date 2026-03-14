@@ -95,13 +95,6 @@ date_default_timezone_set('Asia/Bangkok');
           $is_live = ($now >= $start && $now <= $end);
           $is_past = ($now > $end);
 
-          var_dump([
-            'now' => $now->format('Y-m-d H:i:s'),
-            'start' => $start->format('Y-m-d H:i:s'),
-            'end' => $end->format('Y-m-d H:i:s'),
-            'is_live' => ($now >= $start && $now <= $end)
-          ]);
-
           // 🌟 โค้ดเดิมของคุณ: ดึงตัวเลขรับสมัครออกจาก Description
           $max_limit_main = 0;
           if (preg_match('/\[MAX:(\d+)\]$/', $row['description'], $matches)) {
