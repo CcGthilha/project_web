@@ -15,7 +15,7 @@ if (!$event || $event['user_id'] != $_SESSION['user_id']) {
     exit();
 }
 
-$participants = getParticipantsByEventId($event_id);
+$participants = getApprovedParticipants($event_id);
 
 renderView('view-participants', [
     'title' => 'รายชื่อผู้เข้าร่วม: ' . $event['title'],

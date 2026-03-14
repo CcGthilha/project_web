@@ -134,8 +134,7 @@ function updateRegistrationStatus(int $reg_id, string $status): bool
     return $stmt->execute();
 }
 
-// database/registrations.php
-// 1. ฟังก์ชันสร้างรหัส OTP แบบไม่พึ่งฐานข้อมูล (คำนวณตามเวลา 30 นาที)
+// 1. ฟังก์ชันสร้างรหัส OTP (คำนวณตามเวลา 30 นาที)
 function generateStatelessOTP(int $user_id, int $event_id, $timestamp = null)
 {
     // กำหนด Secret Key ของเว็บเรา (ตั้งเป็นคำอะไรก็ได้)
@@ -206,6 +205,21 @@ function verifyStatelessOTP(int $event_id, string $input_otp)
     return [
         'result' => 'invalid' // รหัสผิด หรือ หมดเวลา
     ];
+}
+
+function isUserApprovedForEvent(int $user_id, int $event_id): bool
+{
+    global $conn; // หรือถ้าใช้ getConnection() ก็สลับมาใช้นะครับ
+
+    $sql = "SELECT registrations_id FROM registrations WHERE user_id = ? AND event_id = ? AND status = 'approved'";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $user_id, $event_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    // ถ้าเจอข้อมูล (มากกว่า 0 แถว) คืนค่า true แปลว่ามีสิทธิ์
+    // ถ้าไม่เจอข้อมูล คืนค่า false แปลว่าไม่มีสิทธิ์
+    return $result->num_rows > 0;
 }
 
 //ฟังก์ชันสำหรับเปลี่ยนสถานะว่า "เข้าร่วมงานแล้ว"

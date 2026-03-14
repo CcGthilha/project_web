@@ -6,16 +6,22 @@ if (!isset($_SESSION['user_id'])) {
         window.location.href='/login';</script>";
     exit();
 }
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $event_id = (int)$_POST['event_id'];
 } else {
     $event_id = (int)$_GET['event_id'];
 }
 
-// เรียกฟังก์ชันคำนวณรหัส (ระบบจะสร้างเลข 6 หลักให้เองตามเวลา)
-$current_otp = generateStatelessOTP($_SESSION['user_id'], $event_id);
+$user_id = $_SESSION['user_id'];
 
-// ส่งรหัสไปแสดงที่หน้าเว็บ
+if (!isUserApprovedForEvent($user_id, $event_id)) {
+    echo "<script>alert('คุณไม่มีสิทธิ์เข้าดูรหัสของงานนี้ หรือยังไม่ได้รับการอนุมัติ'); 
+          window.location.href='/';</script>";
+    exit();
+}
+$current_otp = generateStatelessOTP($user_id, $event_id);
+
 renderView('otp-user', [
     'title' => 'รหัสเข้างานของคุณ',
     'otp' => $current_otp,

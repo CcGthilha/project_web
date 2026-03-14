@@ -21,7 +21,7 @@ while ($row = $res->fetch_assoc()) {
 }
 
 // ดึงรายชื่อคนเข้าร่วม
-$participants = getParticipantsByEventId($event_id);
+$participants = getApprovedParticipants($event_id);
 
 renderView('event-detail', [
     'title' => 'รายละเอียดกิจกรรม', 
