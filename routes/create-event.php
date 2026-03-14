@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             }
         }
 
-
+        
         header('Location: /main');
         exit();
     } else {
