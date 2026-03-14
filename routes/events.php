@@ -12,7 +12,7 @@ $events_with_participants = [];
 while ($row = $res->fetch_assoc()) {
     $event_id = $row['event_id'];
     // ดึงรายชื่อคนเข้าร่วมของกิจกรรมนี้ (ใช้ฟังก์ชันที่สร้างไว้ใน databases/events.php)
-    $participants_res = getApprovedParticipants($event_id);
+    $participants_res = getParticipantsByEventId($event_id);
     $participants = [];
     // เก็บรายชื่อคนเข้าร่วมไว้ในอาร์เรย์
     while ($p = $participants_res->fetch_assoc()) {
