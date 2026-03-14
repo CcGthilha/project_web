@@ -222,6 +222,20 @@ function isUserApprovedForEvent(int $user_id, int $event_id): bool
     return $result->num_rows > 0;
 }
 
+function isUserEventOrganizer(int $user_id, int $event_id): bool
+{
+    global $conn;
+
+    // เช็คว่ามีงาน event_id นี้ที่สร้างโดย user_id นี้หรือไม่
+    $sql = "SELECT event_id FROM events WHERE event_id = ? AND user_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $event_id, $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    return $result->num_rows > 0; // ถ้าเจอแปลว่าเป็นเจ้าของงานจริง คืนค่า true
+}
+
 //ฟังก์ชันสำหรับเปลี่ยนสถานะว่า "เข้าร่วมงานแล้ว"
 function markAsAttended(int $registrations_id)
 {
@@ -232,8 +246,6 @@ function markAsAttended(int $registrations_id)
     $stmt->bind_param('i', $registrations_id);
     return $stmt->execute();
 }
-
-
 
 function getApprovedParticipants(int $event_id): mysqli_result|bool
 {
